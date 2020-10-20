@@ -1,0 +1,127 @@
+#! /bin/bash
+
+set -e
+
+BOB_DIR=${BOB_DIR=bob}
+
+if [ -z "$BOB_DIST" ]; then
+	BOB_SUFFIX=default
+	DOCKERFILE=Dockerfile
+else
+	if [ `echo "$BOB_DIST" | wc -w` != 1 ]; then
+		echo "The BOB_DIST variables can contain at most one word"
+		exit 1
+	fi
+	BOB_SUFFIX=$BOB_DIST
+	DOCKERFILE=Dockerfile.$BOB_DIST
+fi
+
+if [ "$(uname)" == "Darwin" ]; then
+	READLINK_BINARY=greadlink
+	MKTEMP_BINARY=gmktemp
+else
+	READLINK_BINARY=readlink
+	MKTEMP_BINARY=mktemp
+fi
+
+usage() {
+	cat << EOF
+bob - run commands in the current directory, inside a container.
+
+Usage :
+    bob CMD [ARG]              : run CMD in a transient container. CMD can't be one of the protected sub-command
+    bob run CMD [ARG]          : same as above, but CMD can be anything
+    bob [build]                : build or update docker image
+    bob name                   : printthe docker tag name - using BOB_DIST
+    bob (help|--help|-h)       : print this message and exit
+
+Environmentvariables
+    BOB_DIST to select Dockerfile.${BOB_DIST} - Only one word
+    BOB_DIR to change the directory name containing the Dockerfile
+
+bob will look for a ./bob directory containing a Dockerfile to build the
+container, starting in the current directory, then in its parent, all the way to
+/ if necessary.
+EOF
+
+	exit 0
+}
+
+sanity_checks() {
+	if [ -z "$HOME" ]; then
+		echo "\$HOME isn't defined, exiting"
+		exit 1
+	fi
+
+	if ! pwd | grep "^$HOME" &>/dev/null; then
+		echo "Not returning from a home subdirectory, exiting"
+		exit 1
+	fi
+}
+	
+find_root() {
+	OPWD="$(pwd)"
+	while ! [ -d "$BOB_DIR" ]; do
+		cd ..
+		if [ `pwd` == "/" ]; then
+			echo "Walked back, for many miles, and couldn't find a $BOB_DIR/ directory"
+			exit 1
+		fi
+	done
+	if ! [ -e "$BOB_DIR"/$DOCKERFILE ]; then
+		echo "`$READLINK_BINARY -f "$BOB_DIR"/$DOCKERFILE` doesn't exist, not much I can do"
+		exit 1
+	fi
+	BASE="$(pwd)"
+	NAME=$(echo $(whoami)-$(basename $($READLINK_BINARY -f .))-$BOB_SUFFIX | tr '[:upper:]' '[:lower:]')
+}
+
+build () {
+	cd "$BOB_DIR"
+	TDF="$($READLINK_BINARY -f $($MKTEMP_BINARY -p .))"
+	trap "rm \"$TDF\"" exit
+	cp $DOCKERFILE "$TDF"
+	cat <<-'EOF' >> "$TDF"
+	ARG USER
+	ARG UID
+	RUN if [ "$(. /etc/os-release &> /dev/null && echo ${ID})" = "alpine" ]; then adduser -D -u $UID $USER; else useradd -u $UID $USER; fi
+	EOF
+	docker build --pull --build-arg BASE=$BASE --build-arg USER=$(whoami) --build-arg UID=$(id -u) -t $NAME -f "$TDF" .
+	cd ..
+}
+
+maybe_build() {
+	if [ -z "$(docker images -q $NAME 2> /dev/null)" ]; then
+		build
+	fi
+}
+
+run () {
+	maybe_build
+
+	docker run --init -it --network host -e HOME,USER -v "$HOME":"$HOME" --user $USER:$(id -g) --workdir "$OPWD" --rm $NAME $@
+}
+
+if [ "$1" = "help" -o "$1" = "--help" -o "$1" = "-h" ]; then
+	usage
+fi
+
+sanity_checks
+find_root
+
+case "$1" in
+	build|"")
+		build
+		;;
+	name)
+		echo $NAME
+		exit 0
+		;;
+	run)
+		shift
+		run "$@"
+		;;
+	*)
+		run "$@"
+		;;
+esac
