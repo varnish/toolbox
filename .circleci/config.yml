@@ -1,0 +1,35 @@
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:buster
+    steps:
+      - checkout
+      - run:
+          name: Set up
+          command: |
+            apt-get -y update
+            apt-get -qy install git varnish golang prometheus make
+            service varnish start
+      - run:
+          name: Build and test
+          command: |
+            cd prometheus-vstat
+   bob:
+    docker:
+      - image: circleci/golang
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: |
+          cd bob
+          bob_testdir/test.sh
+           make check
+
+workflows:
+  build:
+    jobs:
+      - bob
+      - build
