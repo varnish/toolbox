@@ -99,7 +99,7 @@ maybe_build() {
 run () {
 	maybe_build
 
-	docker run --init -it --network host -e HOME,USER -v "$HOME":"$HOME" --user $USER:$(id -g) --workdir "$OPWD" --rm $NAME $@
+	docker run -it --init --network host -e HOME,USER -v "$HOME":"$HOME" --user $USER:$(id -g) --workdir "$OPWD" --rm $NAME $@
 }
 
 if [ "$1" = "help" -o "$1" = "--help" -o "$1" = "-h" ]; then
