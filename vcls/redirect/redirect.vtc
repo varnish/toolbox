@@ -1,0 +1,47 @@
+varnishtest "Redirects"
+
+server s1 {
+	rxreq
+	expect req.url == "/not_redirected"
+	txresp
+} -start
+
+varnish v1 -proto "PROXY" -vcl+backend {
+	include "${pwd}/redirect.vcl";
+
+	sub vcl_recv {
+		# forget the location
+		if (req.url == "/no_location") {
+			return (synth (301));
+		}
+
+		# correct redirection
+		if (req.url == "/redirect") {
+			set req.http.location = "/new_location";
+			return (synth (302));
+		}
+	}
+} -start
+
+# use the proxy protocol to fake a connection to port 80
+client c1 -proxy2 "1.2.3.4:2314 5.6.7.8:80" {
+	txreq -url "/will_be_redirected" -hdr "host: example.com"
+	rxresp
+	expect resp.status == 301
+	expect resp.http.location == "https://example.com/will_be_redirected"
+} -run
+
+client c1 -proxy2 "1.2.3.4:2314 5.6.7.8:443" {
+	txreq -url "/no_location"
+	rxresp
+	expect resp.status == 503
+
+	txreq -url "/redirect"
+	rxresp
+	expect resp.status == 302
+	expect resp.http.location == "/new_location"
+
+	txreq -url "/not_redirected"
+	rxresp
+	expect resp.status == 200
+} -run

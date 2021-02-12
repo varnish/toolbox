@@ -2,14 +2,21 @@
 
 set -e
 
-BOB_DIR=${BOB_DIR=bob}
+if [ -n "$BOB_DIR" ]; then
+	echo "BOB_DIR is deprecated, BOB_PATH should be used instead" 1>&2
+	BOB_PATH="${BOB_DIR}"
+else
+	BOB_PATH="${BOB_PATH=bob:.circleci:.github}"
+fi
+
+BOB_DIR=
 
 if [ -z "$BOB_DIST" ]; then
 	BOB_SUFFIX=default
 	DOCKERFILE=Dockerfile
 else
 	if [ `echo "$BOB_DIST" | wc -w` != 1 ]; then
-		echo "The BOB_DIST variables can contain at most one word"
+		echo "The BOB_DIST variable can contain at most one word"
 		exit 1
 	fi
 	BOB_SUFFIX=$BOB_DIST
@@ -61,17 +68,24 @@ sanity_checks() {
 	
 find_root() {
 	OPWD="$(pwd)"
-	while ! [ -d "$BOB_DIR" ]; do
-		cd ..
+	IFS_SAVE="$IFS"
+	IFS=:
+	while true; do
+		for dir in $BOB_PATH; do
+			if [ -f "$dir/Dockerfile" ]; then
+				BOB_DIR="$dir"
+				break 2
+			fi
+		done
 		if [ `pwd` == "/" ]; then
-			echo "Walked back, for many miles, and couldn't find a $BOB_DIR/ directory"
+			IFS="$IFS_SAVE"
+			echo "Walked back, for many miles, and couldn't find a {$(echo $BOB_PATH | sed s/:/,/g)}/Dockerfile"
 			exit 1
 		fi
+		cd ..
 	done
-	if ! [ -e "$BOB_DIR"/$DOCKERFILE ]; then
-		echo "`$READLINK_BINARY -f "$BOB_DIR"/$DOCKERFILE` doesn't exist, not much I can do"
-		exit 1
-	fi
+	IFS="$IFS_SAVE"
+
 	BASE="$(pwd)"
 	NAME=$(echo $(whoami)-$(basename $($READLINK_BINARY -f .))-$BOB_SUFFIX | tr '[:upper:]' '[:lower:]')
 }
