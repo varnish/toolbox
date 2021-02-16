@@ -1,0 +1,39 @@
+{
+    "size": 100,
+    "query": {
+      "bool" : {
+          "must" : {
+              "boosting" : {
+                  "positive" : {
+                      "multi_match": {
+                          "query": "<<SEARCH>>",
+                          "type": "bool_prefix",
+                          "fields": [
+                            "title^3",
+                            "content"
+                          ]
+                      }
+                  },
+                  "negative": {
+                          "terms" :{
+                              "uri": ["tutorials","releases","security"]
+                          }
+                  },
+                  "negative_boost": 0.3
+              }
+          },
+          "must_not" :[
+              {"term" : {"hidden" : true}}
+          ]
+      }  
+    },
+    "highlight": {
+        "fields": {
+          "content": {
+            "pre_tags" : ["<mark>"], "post_tags" : ["</mark>"]
+          }
+        }
+    },    
+    "fields": ["title", "uri", "tags"],
+    "_source": false
+}

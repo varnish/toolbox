@@ -1,0 +1,25 @@
+version: '3'
+services:
+  elasticsearch:
+    image: "elasticsearch:7.10.1"
+    container_name: elasticsearch
+    hostname: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+     - "9200:9200"
+  varnish:
+    image: "quay.io/varnish-software/varnish-plus:latest"
+    container_name: varnish
+    hostname: varnish
+    volumes:
+      -  ./default.vcl:/etc/varnish/default.vcl
+      -  ./search.json:/etc/varnish/search.json
+    environment:
+      - VARNISH_LISTEN_PORT=80
+      - VARNISH_TLS_CFG=true
+    ports:
+      - "80:80"
+      - "443:6443"
+    depends_on:
+      - "elasticsearch"
