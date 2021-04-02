@@ -2,6 +2,17 @@
 
 set -e
 
+unset RUNOPTS
+if [ -z "$BOB_BINARY" ]; then
+	if command -v podman -v > /dev/null; then
+		BOB_BINARY=podman
+		RUNOPTS=--userns=keep-id
+	else
+		BOB_BINARY=docker
+		RUNOPTS="--user $USER:$(id -g)"
+	fi
+fi
+
 if [ -n "$BOB_DIR" ]; then
 	echo "BOB_DIR is deprecated, BOB_PATH should be used instead" 1>&2
 	BOB_PATH="${BOB_DIR}"
@@ -38,8 +49,8 @@ bob - run commands in the current directory, inside a container.
 Usage :
     bob CMD [ARG]              : run CMD in a transient container. CMD can't be one of the protected sub-command
     bob run CMD [ARG]          : same as above, but CMD can be anything
-    bob [build]                : build or update docker image
-    bob name                   : printthe docker tag name - using BOB_DIST
+    bob [build]                : build or update container image
+    bob name                   : print the container tag name - using BOB_DIST
     bob (help|--help|-h)       : print this message and exit
 
 Environmentvariables
@@ -100,12 +111,12 @@ build () {
 	ARG UID
 	RUN if [ "$(. /etc/os-release &> /dev/null && echo ${ID})" = "alpine" ]; then adduser -D -u $UID $USER; else useradd -u $UID $USER; fi
 	EOF
-	docker build --pull --build-arg BASE=$BASE --build-arg USER=$(whoami) --build-arg UID=$(id -u) -t $NAME -f "$TDF" .
+	$BOB_BINARY build --no-cache --pull --build-arg BASE=$BASE --build-arg USER=$(whoami) --build-arg UID=$(id -u) -t $NAME -f "$TDF" .
 	cd ..
 }
 
 maybe_build() {
-	if [ -z "$(docker images -q $NAME 2> /dev/null)" ]; then
+	if [ -z "$($BOB_BINARY images -q $NAME 2> /dev/null)" ]; then
 		build
 	fi
 }
@@ -113,7 +124,7 @@ maybe_build() {
 run () {
 	maybe_build
 
-	docker run -it --init --network host -e HOME,USER -v "$HOME":"$HOME" --user $USER:$(id -g) --workdir "$OPWD" --rm $NAME $@
+	$BOB_BINARY run $RUNOPTS -it --init --network host -e HOME,USER -v "$HOME":"$HOME" --workdir "$OPWD" --rm $NAME $@
 }
 
 if [ "$1" = "help" -o "$1" = "--help" -o "$1" = "-h" ]; then
