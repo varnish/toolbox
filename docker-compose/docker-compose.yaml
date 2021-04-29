@@ -1,0 +1,53 @@
+services:
+  varnish:
+    image: varnish
+    volumes:
+      - workdir:/var/lib/varnish
+      - ${VARNISH_VCL}:/etc/varnish/default.vcl
+    ports:
+      - "${HTTP_PORT}:80"
+  hitch:
+    image: hitch
+    volumes:
+      - ${HITCH_CONF}:/etc/hitch/hitch.conf
+      - ${CERT_DIR}:/etc/hitch/certs/
+    ports:
+      - "${HTTPS_PORT}:443"
+  varnishncsa:
+    image: varnish
+    volumes:
+      - workdir:/var/lib/varnish
+      - ${LOG_DIR}:/var/log/varnish
+    command:
+      - varnishncsa
+      - -a
+      - -w
+      - /var/log/varnish/${NCSA_LOG}
+  varnishlog:
+    image: varnish
+    volumes:
+      - workdir:/var/lib/varnish
+      - ${LOG_DIR}:/var/log/varnish
+    command:
+      - varnishlog
+      - -a
+      - -w
+      - /var/log/varnish/${BIN_LOG}
+  origin:
+    image: python
+    volumes:
+      - ${ORIGIN_DATA}:/orig_data
+    command:
+      - python
+      - -m
+      - http.server
+      - --directory
+      - /orig_data
+      - "80"
+
+volumes:
+  workdir:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
