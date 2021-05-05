@@ -1,0 +1,57 @@
+varnishtest "BAN "
+
+server s1 {
+	rxreq
+	txresp -hdr "version: foo_0"
+
+	rxreq
+	txresp -hdr "version: bar_0"
+
+	rxreq
+	txresp -hdr "version: foo_1"
+
+	rxreq
+	txresp -hdr "version: bar_1"
+} -start
+
+varnish v1 -vcl+backend {
+import std;
+	include "${pwd}/invalidate.vcl";
+
+	sub vcl_recv {
+		# trust everyone
+		set req.http.invalidate-user-authorized = "true";
+		call invalidate;
+	}
+} -start
+
+varnish v1 -cliok "param.set debug +syncvsl"
+
+client c1 {
+	txreq -hdr "host: foo.com"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.version == "foo_0"
+
+	txreq -hdr "host: bar.com"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.version == "bar_0"
+
+	# banall the cache
+	txreq -method PURGEALL
+	rxresp
+	expect resp.status == 200
+
+	# this one will be new
+	txreq -hdr "host: foo.com"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.version == "foo_1"
+
+	# this one too
+	txreq -hdr "host: bar.com"
+	rxresp
+	expect resp.status == 200
+	expect resp.http.version == "bar_1"
+} -run
