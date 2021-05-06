@@ -18,6 +18,7 @@ OVERWRITE=${OVERWRITE=y}
 declare -A INSTALL_TBL
 INSTALL_TBL[41]="varnish-plus varnish-plus-vmods-extra varnish-plus-addon-ssl varnish-agent varnish-plus-ha varnish-broadcaster"
 INSTALL_TBL[60]="varnish-plus varnish-plus-vmods-extra varnish-plus-addon-ssl varnish-agent varnish-plus-ha varnish-broadcaster"
+INSTALL_TBL[controller]="varnish-controller-agent varnish-controller-brainz varnish-controller-api-gw varnish-controller-nats varnish-controller-cli"
 INSTALL_TBL[60-akamai-connector]="varnish-plus-akamai-connector"
 INSTALL_TBL[60-deviceatlas]="vmod-deviceatlas"
 INSTALL_TBL[60-waf]="varnish-plus-waf"
