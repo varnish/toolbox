@@ -1,4 +1,4 @@
-varnishtest "PURGEDIR "
+varnishtest "BAN "
 
 server s1 {
 	rxreq
@@ -48,7 +48,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# mismatching host, this should have no effect
-	txreq -method PURGEDIR -hdr "host: baz.com"
+	txreq -method BAN -hdr "host: baz.com"
 	rxresp
 	expect resp.status == 200
 
@@ -63,7 +63,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# ban foo.com
-	txreq -method PURGEDIR -hdr "host: foo.com"
+	txreq -method BAN -hdr "host: foo.com"
 	rxresp
 	expect resp.status == 200
 
@@ -80,7 +80,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# ban everything
-	txreq -method PURGEDIR -hdr "host: foo.com" -hdr "ignore-host: true"
+	txreq -method BAN -hdr "host: foo.com" -hdr "ignore-host: true"
 	rxresp
 	expect resp.status == 200
 

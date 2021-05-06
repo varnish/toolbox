@@ -147,20 +147,20 @@ returns, no invalidated content will be served by Varnish.
 ### Purge
 
 Purging is the simplest way to remove content from Varnish and allow you to
-target a specific URL. It is implemented here with the `PURGEONE` method,
+target a specific URL. It is implemented here with the `PURGE` method,
 for example:
 
 ``` bash
-$ curl -X PURGEONE http://192.168.0.34/path/to/object/to/purge.html -H "host: example.com"
-Successful purgeone request
+$ curl -X PURGE http://192.168.0.34/path/to/object/to/purge.html -H "host: example.com"
+Successful purge request
 ```
 
 Note the use of `-H` to force the `host` header. It's important because a purge
-relies on hashing a request to find the object to remove, so the `PURGEONE` request
+relies on hashing a request to find the object to remove, so the `PURGE` request
 must match the `GET` request that inserted it (at least the `host` and `path`).
 
 API:
-- method: must be `PURGEONE`
+- method: must be `PURGE`
 - URL: must match the purged object
 - path: must match the purged object
 - in `vcl_recv`, `req.http.invalidate-purge-allow` must be `"true"` (the default)
@@ -174,8 +174,8 @@ and in this implementation, it's used to invalidate entire subtrees of content.
 For example:
 
 ``` bash
-$ curl -X PURGEDIR http://192.168.0.34/path/to/directory/to/purge/ -H "host: example.com"
-Successful purgedir request
+$ curl -X BAN http://192.168.0.34/path/to/directory/to/purge/ -H "host: example.com"
+Successful ban request
 ```
 
 will invalidate any object with a URL matching
@@ -194,7 +194,7 @@ sub vcl_recv {
 ```
 
 API:
-- method: must be `PURGEDIR`
+- method: must be `BAN`
 - URL: must match the purged object
 - path: must match the purged object
 - in `vcl_recv`, `req.http.invalidate-ban-allow` must be `"true"` (the default)
@@ -251,7 +251,7 @@ same way, the change is only at the VCL level.
 ### Purge
 
 API:
-- method: must be `PURGEONE`
+- method: must be `PURGE`
 - URL: must match the purged object
 - path: must match the purged object
 - in `invalidate_opts`, `purge-allow` must be `"true"` (the default)
@@ -259,7 +259,7 @@ API:
 ### Ban
 
 API:
-- method: must be `PURGEDIR`
+- method: must be `BAN`
 - URL: must match the purged object
 - path: must match the purged object
 - in `invalidate_opts`, `ban-allow` must be `"true"` (the default)
@@ -296,13 +296,13 @@ sub vcl_backend_response {
 ```
 
 The method used here is `PURGETAG` and disregards both the `host` and `path` to
-focus only on the `rmtag-list` containing the list of tags to flush.
+focus only on the `purgetag-list` containing the list of tags to flush.
 
 ``` bash
-$ curl -X PURGEALL http://192.168.0.34/ -H "rmtag-list: foo, bar, qux"
+$ curl -X PURGEALL http://192.168.0.34/ -H "purgetag-list: foo, bar, qux"
 Successful purgetag request: 532876 objects removed
 ```
 
 API:
 - method: must be `PURGETAG`
-- `rmtag-list` header: contains a comma-separated list of tags to invalidate
+- `purgetag-list` header: contains a comma-separated list of tags to invalidate

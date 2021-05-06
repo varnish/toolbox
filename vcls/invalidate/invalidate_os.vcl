@@ -2,12 +2,12 @@
 // this file shouldn't be modified, instead, the option should be set in
 // vcl_recv from the file including this one
 sub vcl_recv {
-	// PURGEONE, PURGEDIR and PURGEALL are allowed by default
+	// PURGE, BAN and PURGEALL are allowed by default
 	set req.http.invalidate-purge-allow = "true";
 	set req.http.invalidate-ban-allow = "true";
-	set req.http.invalidate-zero-allow = "true";
+	set req.http.invalidate-purgeall-allow = "true";
 
-	// PURGEDIR should take the host header into acount
+	// BAN should take the host header into acount
 	set req.http.invalidate-ban-ignore-host = "false";
 
 	// the default is to not trust a request, until told otherwise
@@ -20,24 +20,24 @@ sub vcl_recv {
 sub invalidate {
 	// for each method, check if the configuration allows it, and invalidate
 	// according to it, setting req.http.invalidate-message
-	if (req.method == "PURGEONE") {
+	if (req.method == "PURGE") {
 		if (req.http.invalidate-user-authorized != "true") {
 			set req.http.invalidate-message = "Unauthorized request";
 			return (synth(405));
 		}
 		if (req.http.invalidate-purge-allow != "true") {
-			set req.http.invalidate-message = "PURGEONE is disabled on this host";
+			set req.http.invalidate-message = "PURGE is disabled on this host";
 			return (synth(405));
 		}
-		set req.http.invalidate-message = "Successful purgeone request";
+		set req.http.invalidate-message = "Successful purge request";
 		return (purge);
-	} else if (req.method == "PURGEDIR") {
+	} else if (req.method == "BAN") {
 		if (req.http.invalidate-user-authorized != "true") {
 			set req.http.invalidate-message = "Unauthorized request";
 			return (synth(405));
 		}
 		if (req.http.invalidate-ban-allow != "true") {
-			set req.http.invalidate-message = "PURGEDIR is disabled on this host";
+			set req.http.invalidate-message = "BAN is disabled on this host";
 			return (synth(405));
 		}
 		if (req.http.invalidate-ban-ignore-host == "true") {
@@ -45,14 +45,14 @@ sub invalidate {
 		} else {
 			ban("obj.http.invalidate-url ~ ^" + req.url + " && obj.http.invalidate-host == " + req.http.host);
 		}
-		set req.http.invalidate-message = "Successful purgedir request";
+		set req.http.invalidate-message = "Successful ban request";
 		return (synth(200));
 	} else if (req.method == "PURGEALL") {
 		if (req.http.invalidate-user-authorized != "true") {
 			set req.http.invalidate-message = "Unauthorized request";
 			return (synth(405));
 		}
-		if (req.http.invalidate-zero-allow != "true") {
+		if (req.http.invalidate-purgeall-allow != "true") {
 			set req.http.invalidate-message = "PURGEALL is disabled on this host";
 			return (synth(405));
 		}
@@ -66,7 +66,7 @@ sub invalidate {
 sub vcl_backend_fetch {
 	unset bereq.http.invalidate-purge-allow;
 	unset bereq.http.invalidate-ban-allow;
-	unset bereq.http.invalidate-zero-allow;
+	unset bereq.http.invalidate-purgeall-allow;
 	unset bereq.http.invalidate-ban-ignore-host;
 	unset bereq.http.invalidate-user-authorized;
 	unset bereq.http.invalidate-message;

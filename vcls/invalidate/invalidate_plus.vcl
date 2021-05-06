@@ -1,4 +1,5 @@
 import kvstore;
+import std;
 import ykey;
 
 # by leveraging kvstore we won't need to use headers to carry option values,
@@ -7,69 +8,55 @@ sub vcl_init {
 	# scope = REQUEST defines a global store that can be overridden at the
 	# request level
 	new invalidate_opts = kvstore.init(scope = REQUEST);
-	// PURGEONE, PURGEDIR and PURGETAG are allowed by default
+	// PURGE, BAN, PURGEALL,  and PURGETAG are allowed by default
 	invalidate_opts.set("purge-allow", "true");
 	invalidate_opts.set("ban-allow", "true");
-	invalidate_opts.set("zero-allow", "true");
-	invalidate_opts.set("rmtag-allow", "true");
-	// should PURGEDIR take the host header into acount
+	invalidate_opts.set("purgeall-allow", "true");
+	invalidate_opts.set("purgetag-allow", "true");
+	// should BAN take the host header into acount
 	invalidate_opts.set("ban-ignore-host", "false");
 	// the default is to not trust a request, until told otherwise
 	invalidate_opts.set("user-authorized", "false");
 }
 
+// each implementation will check if the user is authorized and if the method
+// is enabled
+sub invalidate_method_check {
+	if (invalidate_opts.get("user-authorized") != "true") {
+		invalidate_opts.set("message", "Unauthorized request");
+		return (synth(405));
+	}
+
+	if (invalidate_opts.get(std.tolower(req.method) + "-allow") != "true") {
+		invalidate_opts.set("message", req.method + " is disabled on this host");
+		return (synth(405));
+	}
+}
+
 sub invalidate {
 	// for each method, check if the configuration allows it, and invalidate
 	// according to it, setting req.http.invalidate-message
-	if (req.method == "PURGEONE") {
-		if (invalidate_opts.get("user-authorized") != "true") {
-			invalidate_opts.set("message", "Unauthorized request");
-			return (synth(405));
-		}
-		if (invalidate_opts.get("purge-allow") != "true") {
-			invalidate_opts.set("message", "PURGEONE is disabled on this host");
-			return (synth(405));
-		}
-		invalidate_opts.set("message", "Successful purgeone request");
+	if (req.method == "PURGE") {
+		call invalidate_method_check;
+		invalidate_opts.set("message", "Successful purge request");
 		return (purge);
-	} else if (req.method == "PURGEDIR") {
-		if (invalidate_opts.get("user-authorized") != "true") {
-			invalidate_opts.set("message", "Unauthorized request");
-			return (synth(405));
-		}
-		if (invalidate_opts.get("ban-allow") != "true") {
-			invalidate_opts.set("message", "PURGEDIR is disabled on this host");
-			return (synth(405));
-		}
+	} else if (req.method == "BAN") {
+		call invalidate_method_check;
 		if (invalidate_opts.get("ban-ignore-host") == "true") {
 			ban("obj.http.invalidate-url ~ ^" + req.url);
 		} else {
 			ban("obj.http.invalidate-url ~ ^" + req.url + " && obj.http.invalidate-host == " + req.http.host);
 		}
-		invalidate_opts.set("message", "Successful purgedir request");
+		invalidate_opts.set("message", "Successful ban request");
 		return (synth(200));
 	} else if (req.method == "PURGEALL") {
-		if (invalidate_opts.get("user-authorized") != "true") {
-			invalidate_opts.set("message", "Unauthorized request");
-			return (synth(405));
-		}
-		if (invalidate_opts.get("ban-allow") != "true") {
-			invalidate_opts.set("message", "PURGEDIR is disabled on this host");
-			return (synth(405));
-		}
+		call invalidate_method_check;
 		ban("obj.status != 0");
 		invalidate_opts.set("message", "Successful purgeall request");
 		return (synth(200));
 	} else if (req.method == "PURGETAG") {
-		if (invalidate_opts.get("user-authorized") != "true") {
-			invalidate_opts.set("message", "Unauthorized request");
-			return (synth(405));
-		}
-		if (invalidate_opts.get("rmtag-allow") != "true") {
-			invalidate_opts.set("message", "PURGETAG is disabled on this host");
-			return (synth(405));
-		}
-		invalidate_opts.set("message", "Successful purgetag request: " + ykey.purge_header(req.http.rmtag-list) + " objects removed");
+		call invalidate_method_check;
+		invalidate_opts.set("message", "Successful purgetag request: " + ykey.purge_header(req.http.purgetag-list) + " objects removed");
 		return (synth(200));
 	}
 }

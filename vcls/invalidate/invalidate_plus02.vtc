@@ -1,4 +1,4 @@
-varnishtest "PURGEDIR"
+varnishtest "BAN"
 
 server s1 {
 	rxreq
@@ -48,28 +48,28 @@ client c1 {
 	expect resp.http.version == "1"
 
 	# ban it without the ok header
-	txreq -req PURGEDIR
+	txreq -req BAN
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
 	# try to be clever as sneak the invalidate-user-authorized header in
-	txreq -req PURGEDIR -hdr "invalidate-user-authorized: true"
+	txreq -req BAN -hdr "invalidate-user-authorized: true"
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
-	# try to ban, but PURGEDIR is now forbidden
-	txreq -req PURGEDIR -hdr "user: ok" -hdr "method: nok"
+	# try to ban, but BAN is now forbidden
+	txreq -req BAN -hdr "user: ok" -hdr "method: nok"
 	rxresp
 	expect resp.status == 405
-	expect resp.body == "PURGEDIR is disabled on this host"
+	expect resp.body == "BAN is disabled on this host"
 
 	# ban for good
-	txreq  -url "/bar" -req PURGEDIR -hdr "user: ok"
+	txreq  -url "/bar" -req BAN -hdr "user: ok"
 	rxresp
 	expect resp.status == 200
-	expect resp.body == "Successful purgedir request"
+	expect resp.body == "Successful ban request"
 
 	# get a new version
 	txreq -url "/bar"
