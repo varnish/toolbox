@@ -1,4 +1,4 @@
-varnishtest "BAN "
+varnishtest "PURGEDIR "
 
 server s1 {
 	rxreq
@@ -39,7 +39,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# zero the cache
-	txreq -method ZERO
+	txreq -method PURGEALL
 	rxresp
 	expect resp.status == 200
 

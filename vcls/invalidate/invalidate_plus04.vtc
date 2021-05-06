@@ -1,4 +1,4 @@
-varnishtest "RMTAG"
+varnishtest "PURGETAG"
 
 server s1 {
 	rxreq
@@ -46,7 +46,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# mismatching host, this should have no effect
-	txreq -req RMTAG -hdr "rmtag-list: baz"
+	txreq -req PURGETAG -hdr "rmtag-list: baz"
 	rxresp
 	expect resp.status == 200
 
@@ -61,7 +61,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# ban foo
-	txreq -req RMTAG -hdr "rmtag-list: foo"
+	txreq -req PURGETAG -hdr "rmtag-list: foo"
 	rxresp
 	expect resp.status == 200
 
@@ -78,7 +78,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# ban everything
-	txreq -req RMTAG -hdr "rmtag-list: all"
+	txreq -req PURGETAG -hdr "rmtag-list: all"
 	rxresp
 	expect resp.status == 200
 

@@ -7,12 +7,12 @@ sub vcl_init {
 	# scope = REQUEST defines a global store that can be overridden at the
 	# request level
 	new invalidate_opts = kvstore.init(scope = REQUEST);
-	// PURGE, BAN and RMTAG are allowed by default
+	// PURGEONE, PURGEDIR and PURGETAG are allowed by default
 	invalidate_opts.set("purge-allow", "true");
 	invalidate_opts.set("ban-allow", "true");
 	invalidate_opts.set("zero-allow", "true");
 	invalidate_opts.set("rmtag-allow", "true");
-	// should BAN take the host header into acount
+	// should PURGEDIR take the host header into acount
 	invalidate_opts.set("ban-ignore-host", "false");
 	// the default is to not trust a request, until told otherwise
 	invalidate_opts.set("user-authorized", "false");
@@ -21,24 +21,24 @@ sub vcl_init {
 sub invalidate {
 	// for each method, check if the configuration allows it, and invalidate
 	// according to it, setting req.http.invalidate-message
-	if (req.method == "PURGE") {
+	if (req.method == "PURGEONE") {
 		if (invalidate_opts.get("user-authorized") != "true") {
 			invalidate_opts.set("message", "Unauthorized request");
 			return (synth(405));
 		}
 		if (invalidate_opts.get("purge-allow") != "true") {
-			invalidate_opts.set("message", "PURGE is disabled on this host");
+			invalidate_opts.set("message", "PURGEONE is disabled on this host");
 			return (synth(405));
 		}
-		invalidate_opts.set("message", "Successful purge");
+		invalidate_opts.set("message", "Successful purgeone request");
 		return (purge);
-	} else if (req.method == "BAN") {
+	} else if (req.method == "PURGEDIR") {
 		if (invalidate_opts.get("user-authorized") != "true") {
 			invalidate_opts.set("message", "Unauthorized request");
 			return (synth(405));
 		}
 		if (invalidate_opts.get("ban-allow") != "true") {
-			invalidate_opts.set("message", "BAN is disabled on this host");
+			invalidate_opts.set("message", "PURGEDIR is disabled on this host");
 			return (synth(405));
 		}
 		if (invalidate_opts.get("ban-ignore-host") == "true") {
@@ -46,30 +46,30 @@ sub invalidate {
 		} else {
 			ban("obj.http.invalidate-url ~ ^" + req.url + " && obj.http.invalidate-host == " + req.http.host);
 		}
-		invalidate_opts.set("message", "Successful ban");
+		invalidate_opts.set("message", "Successful purgedir request");
 		return (synth(200));
-	} else if (req.method == "ZERO") {
+	} else if (req.method == "PURGEALL") {
 		if (invalidate_opts.get("user-authorized") != "true") {
 			invalidate_opts.set("message", "Unauthorized request");
 			return (synth(405));
 		}
 		if (invalidate_opts.get("ban-allow") != "true") {
-			invalidate_opts.set("message", "BAN is disabled on this host");
+			invalidate_opts.set("message", "PURGEDIR is disabled on this host");
 			return (synth(405));
 		}
 		ban("obj.status != 0");
-		invalidate_opts.set("message", "Successful zero");
+		invalidate_opts.set("message", "Successful purgeall request");
 		return (synth(200));
-	} else if (req.method == "RMTAG") {
+	} else if (req.method == "PURGETAG") {
 		if (invalidate_opts.get("user-authorized") != "true") {
 			invalidate_opts.set("message", "Unauthorized request");
 			return (synth(405));
 		}
 		if (invalidate_opts.get("rmtag-allow") != "true") {
-			invalidate_opts.set("message", "RMTAG is disabled on this host");
+			invalidate_opts.set("message", "PURGETAG is disabled on this host");
 			return (synth(405));
 		}
-		invalidate_opts.set("message", "Successful rmtag: " + ykey.purge_header(req.http.rmtag-list) + " objects removed");
+		invalidate_opts.set("message", "Successful purgetag request: " + ykey.purge_header(req.http.rmtag-list) + " objects removed");
 		return (synth(200));
 	}
 }
