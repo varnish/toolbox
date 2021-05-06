@@ -6,7 +6,7 @@ if [ -n "$BOB_DIR" ]; then
 	echo "BOB_DIR is deprecated, BOB_PATH should be used instead" 1>&2
 	BOB_PATH="${BOB_DIR}"
 else
-	BOB_PATH="${BOB_PATH=bob:.circleci:.github}"
+	BOB_PATH="${BOB_PATH=bob:.bob:.circleci:.github}"
 fi
 
 BOB_DIR=
