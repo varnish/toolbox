@@ -153,9 +153,8 @@ Each of the different invalidation method can be forbidden individually by
 setting the corresponding option to `"false"` (they are all `"true"` by
 default).
 
-### Open-source
-
 ``` vcl
+# Open-source
 sub vcl_recv {
 	...
 	set req.http.invalidate-purge-allow = "false";
@@ -165,9 +164,9 @@ sub vcl_recv {
 }
 ```
 
-### Plus
 
 ``` vcl
+# Plus
 sub vcl_recv {
 	...
 	invalidate_opts.set("purge-allow", "false");
@@ -184,9 +183,9 @@ When invalidating a subtree, by default, the deletion is focused on the `host`
 specified in the invalidation request. By setting `bandir-ignore-host` to 
 "true"`, one can invalidate all the matching subtrees across all the domains.
 
-### Open-source
 
 ``` vcl
+# Open-source
 sub vcl_recv {
 	...
 	set req.http.invalidate-bandir-ignore-host = "true";
@@ -194,9 +193,8 @@ sub vcl_recv {
 }
 ```
 
-### Plus
-
 ``` vcl
+# Plus
 sub vcl_recv {
 	...
 	invalidate_opts.set("bandir-ignore-host", "true");
@@ -212,9 +210,8 @@ the secret invalidation requests must set to be trusted.
 *Note: if combined with `ip-acl`, requests must fulfill both requirements, and if
 neither is set, all invalidation requests will be denied.*
 
-### Open-source
-
 ``` vcl
+# Open-source
 sub vcl_recv {
 	...
 	set req.http.invalidate-bearer-token == "VerySecretToken";
@@ -222,9 +219,8 @@ sub vcl_recv {
 }
 ```
 
-### Plus
-
 ``` vcl
+# Plus
 sub vcl_recv {
 	...
 	invalidate_opts.set("bearer-token", "VerySecretToken");
@@ -241,9 +237,8 @@ In that case the client's IP is checked against this list to be trusted.
 *Note: if combined with `bearer-token`, requests must fulfill both
 requirements, and if neither is set, all invalidation requests will be denied.*
 
-### Open-source
-
 ``` vcl
+# Open-source
 sub vcl_recv {
 	...
 	set req.http.invalidate-ip-vcl == "VerySecretToken";
@@ -251,9 +246,8 @@ sub vcl_recv {
 }
 ```
 
-### Plus
-
 ``` vcl
+# Plus
 sub vcl_recv {
 	...
 	invalidate_opts.set("ip-vcl", "VerySecretToken");
@@ -269,6 +263,7 @@ to `"true"` before calling `invalidate`, the request will be trusted, regardless
 of `ip-acl` and `bearer-token`.
 
 ``` vcl
+# Open-source
 sub vcl_recv {
 	...
 	# only URLs starting with "/static/" can be purge, if the user-agent
@@ -280,9 +275,8 @@ sub vcl_recv {
 }
 ```
 
-### Plus
-
 ``` vcl
+# Plus
 sub vcl_recv {
 	...
 	# only URLs starting with "/static/" can be purge, if the user-agent
