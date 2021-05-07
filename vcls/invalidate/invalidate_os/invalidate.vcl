@@ -1,3 +1,5 @@
+import std;
+
 // automatically set a few headers that we'll use as configuration
 // this file shouldn't be modified, instead, the option should be set in
 // vcl_recv from the file including this one
@@ -15,16 +17,39 @@ sub vcl_recv {
 
 	// this header will be use to report back to the user, so we clear it
 	unset req.http.invalidate-message;
+
+	// no bearer-token by default
+	unset req.http.invalidate-bearer-token;
+}
+
+sub invalidate_check {
+	if (req.http.invalidate-bearer-token &&
+	    req.http.invalidate-bearer-token != "") {
+		if (!req.http.authorization) {
+			set req.http.invalidate-message = "Missing Authorization header";
+			return (synth(405));
+		}
+		if (req.http.authorization !~ "(?i)^bearer ") {
+			set req.http.invalidate-message = "Invalid Authorization type";
+			return (synth(405));
+		}
+		if (regsub(req.http.authorization, "(?i)^bearer ", "") != req.http.invalidate-bearer-token) {
+			set req.http.invalidate-message = "Invalid bearer token";
+			return (synth(405));
+		}
+		set req.http.invalidate-user-authorized = "true";
+	}
+	if (req.http.invalidate-user-authorized != "true") {
+		set req.http.invalidate-message = "Unauthorized request";
+		return (synth(405));
+	}
 }
 
 sub invalidate {
 	// for each method, check if the configuration allows it, and invalidate
 	// according to it, setting req.http.invalidate-message
 	if (req.method == "PURGE") {
-		if (req.http.invalidate-user-authorized != "true") {
-			set req.http.invalidate-message = "Unauthorized request";
-			return (synth(405));
-		}
+		call invalidate_check;
 		if (req.http.invalidate-purge-allow != "true") {
 			set req.http.invalidate-message = "PURGE is disabled on this host";
 			return (synth(405));
@@ -32,10 +57,7 @@ sub invalidate {
 		set req.http.invalidate-message = "Successful purge request";
 		return (purge);
 	} else if (req.method == "BAN") {
-		if (req.http.invalidate-user-authorized != "true") {
-			set req.http.invalidate-message = "Unauthorized request";
-			return (synth(405));
-		}
+		call invalidate_check;
 		if (req.http.invalidate-ban-allow != "true") {
 			set req.http.invalidate-message = "BAN is disabled on this host";
 			return (synth(405));
@@ -48,10 +70,7 @@ sub invalidate {
 		set req.http.invalidate-message = "Successful ban request";
 		return (synth(200));
 	} else if (req.method == "PURGEALL") {
-		if (req.http.invalidate-user-authorized != "true") {
-			set req.http.invalidate-message = "Unauthorized request";
-			return (synth(405));
-		}
+		call invalidate_check;
 		if (req.http.invalidate-banall-allow != "true") {
 			set req.http.invalidate-message = "PURGEALL is disabled on this host";
 			return (synth(405));

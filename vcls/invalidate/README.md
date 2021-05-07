@@ -301,4 +301,4 @@ You can also leverage [bob](https://github.com/varnish/toolbox/tree/master/bob)
 (available in this same repository) to run the test in a container:
 
 ``` bash
-../../bob/bob varnishtest -j 4 *.vtc
+../../../bob/bob varnishtest -j 4 *.vtc
