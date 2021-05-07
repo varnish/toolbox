@@ -1,0 +1,99 @@
+varnishtest "Access control"
+
+server s1 {} -start
+
+# token only
+varnish v1 -proto "PROXY" -vcl+backend {
+import std;
+	include "${pwd}/invalidate.vcl";
+
+	sub vcl_recv {
+		invalidate_opts.set("bearer-token", "myToken");
+		call invalidate;
+	}
+} -start
+
+client c1 -proxy2 "1.2.3.4:2314 5.6.7.8:80" {
+	txreq -req PURGE
+	rxresp
+	expect resp.status == 405
+	expect resp.body == "Missing Authorization header"
+
+	txreq -req PURGE -hdr "Authorization: notBearer myToken"
+	rxresp
+	expect resp.status == 405
+	expect resp.body == "Invalid Authorization type"
+
+	txreq -req PURGE -hdr "Authorization: beAreR myToken"
+	rxresp
+	expect resp.status == 200
+} -run
+
+# ACL only
+varnish v1 -vcl+backend {
+import std;
+	include "${pwd}/invalidate.vcl";
+
+	sub vcl_recv {
+		invalidate_opts.set("ip-acl", "!1.2.3.6, 1.2.3.0/24");
+		call invalidate;
+	}
+}
+
+client c1 -proxy2 "1.2.3.4:2314 5.6.7.8:80" {
+	txreq -req PURGE
+	rxresp
+	expect resp.status == 200
+} -run
+
+client c1 -proxy2 "1.2.3.6:2314 5.6.7.8:80" {
+	txreq -req PURGE
+	rxresp
+	expect resp.status == 405
+	expect resp.body == "Unauthorized IP"
+} -run
+
+client c1 -proxy2 "1.1.1.1:2314 5.6.7.8:80" {
+	txreq -req PURGE
+	rxresp
+	expect resp.status == 405
+	expect resp.body == "Unauthorized IP"
+} -run
+
+# token + ACL
+varnish v1 -vcl+backend {
+import std;
+	include "${pwd}/invalidate.vcl";
+
+	sub vcl_recv {
+		invalidate_opts.set("bearer-token", "myToken");
+		invalidate_opts.set("ip-acl", "!1.2.3.6, 1.2.3.0/24");
+		call invalidate;
+	}
+}
+
+client c1 -proxy2 "1.2.3.4:2314 5.6.7.8:80" {
+	txreq -req PURGE
+	rxresp
+	expect resp.status == 405
+	expect resp.body == "Missing Authorization header"
+
+
+	txreq -req PURGE -hdr "authorization: bearer myToken"
+	rxresp
+	expect resp.status == 200
+} -run
+
+client c1 -proxy2 "1.2.3.6:2314 5.6.7.8:80" {
+	txreq -req PURGE -hdr "authorization: bearer myToken"
+	rxresp
+	expect resp.status == 405
+	expect resp.body == "Unauthorized IP"
+} -run
+
+client c1 -proxy2 "1.1.1.1:2314 5.6.7.8:80" {
+	txreq -req PURGE -hdr "authorization: bearer myToken"
+	rxresp
+	expect resp.status == 405
+	expect resp.body == "Unauthorized IP"
+} -run

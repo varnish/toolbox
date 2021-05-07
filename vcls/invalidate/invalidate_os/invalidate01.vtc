@@ -12,14 +12,14 @@ server s1 {
 } -start
 
 varnish v1 -vcl+backend {
-	include "${pwd}/invalidate_plus.vcl";
+	include "${pwd}/invalidate.vcl";
 
 	sub vcl_recv {
 		if (req.http.user == "ok") {
-			invalidate_opts.set("user-authorized", "true");
+			set req.http.invalidate-user-authorized = "true";
 		}
 		if (req.http.method == "nok") {
-			invalidate_opts.set("purge-allow", "false");
+			set req.http.invalidate-purge-allow = "false";
 		}
 		call invalidate;
 	}
@@ -47,25 +47,25 @@ client c1 {
 	expect resp.http.version == "1"
 
 	# purge it without the ok header
-	txreq -req PURGE
+	txreq -method PURGE
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
 	# try to be clever as sneak the invalidate-user-authorized header in
-	txreq -req PURGE -hdr "invalidate-user-authorized: true"
+	txreq -method PURGE -hdr "invalidate-user-authorized: true"
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
 	# try to purge, but PURGE is now forbidden
-	txreq -req PURGE -hdr "user: ok" -hdr "method: nok"
+	txreq -method PURGE -hdr "user: ok" -hdr "method: nok"
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "PURGE is disabled on this host"
 
 	# purge for good
-	txreq -req PURGE -hdr "user: ok"
+	txreq -method PURGE -hdr "user: ok"
 	rxresp
 	expect resp.status == 200
 	expect resp.body == "Successful purge request"

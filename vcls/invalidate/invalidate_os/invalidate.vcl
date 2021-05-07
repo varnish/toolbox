@@ -5,7 +5,7 @@ sub vcl_recv {
 	// PURGE, BAN and PURGEALL are allowed by default
 	set req.http.invalidate-purge-allow = "true";
 	set req.http.invalidate-ban-allow = "true";
-	set req.http.invalidate-purgeall-allow = "true";
+	set req.http.invalidate-banall-allow = "true";
 
 	// BAN should take the host header into acount
 	set req.http.invalidate-ban-ignore-host = "false";
@@ -52,12 +52,12 @@ sub invalidate {
 			set req.http.invalidate-message = "Unauthorized request";
 			return (synth(405));
 		}
-		if (req.http.invalidate-purgeall-allow != "true") {
+		if (req.http.invalidate-banall-allow != "true") {
 			set req.http.invalidate-message = "PURGEALL is disabled on this host";
 			return (synth(405));
 		}
 		ban("obj.status != 0");
-		set req.http.invalidate-message = "Successful purgeall request";
+		set req.http.invalidate-message = "Successful banall request";
 		return (synth(200));
 	}
 }
@@ -66,7 +66,7 @@ sub invalidate {
 sub vcl_backend_fetch {
 	unset bereq.http.invalidate-purge-allow;
 	unset bereq.http.invalidate-ban-allow;
-	unset bereq.http.invalidate-purgeall-allow;
+	unset bereq.http.invalidate-banall-allow;
 	unset bereq.http.invalidate-ban-ignore-host;
 	unset bereq.http.invalidate-user-authorized;
 	unset bereq.http.invalidate-message;

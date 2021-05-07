@@ -12,15 +12,14 @@ server s1 {
 } -start
 
 varnish v1 -vcl+backend {
-import std;
-	include "${pwd}/invalidate_plus.vcl";
+	include "${pwd}/invalidate.vcl";
 
 	sub vcl_recv {
 		if (req.http.user == "ok") {
-			invalidate_opts.set("user-authorized", "true");
+			set req.http.invalidate-user-authorized = "true";
 		}
 		if (req.http.method == "nok") {
-			invalidate_opts.set("ban-allow", "false");
+			set req.http.invalidate-ban-allow = "false";
 		}
 		call invalidate;
 	}
@@ -48,25 +47,25 @@ client c1 {
 	expect resp.http.version == "1"
 
 	# ban it without the ok header
-	txreq -req BAN
+	txreq -method BAN
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
 	# try to be clever as sneak the invalidate-user-authorized header in
-	txreq -req BAN -hdr "invalidate-user-authorized: true"
+	txreq -method BAN -hdr "invalidate-user-authorized: true"
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
 	# try to ban, but BAN is now forbidden
-	txreq -req BAN -hdr "user: ok" -hdr "method: nok"
+	txreq -method BAN -hdr "user: ok" -hdr "method: nok"
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "BAN is disabled on this host"
 
 	# ban for good
-	txreq  -url "/bar" -req BAN -hdr "user: ok"
+	txreq  -url "/bar" -method BAN -hdr "user: ok"
 	rxresp
 	expect resp.status == 200
 	expect resp.body == "Successful ban request"

@@ -1,36 +1,34 @@
-varnishtest "BAN "
+varnishtest "PURGETAG"
 
 server s1 {
 	rxreq
-	txresp -hdr "version: foo_0"
+	txresp -hdr "version: foo_0" -hdr "tags: foo, all"
 
 	rxreq
-	txresp -hdr "version: bar_0"
+	txresp -hdr "version: bar_0" -hdr "tags: bar, all"
 
 	rxreq
-	txresp -hdr "version: foo_1"
+	txresp -hdr "version: foo_1" -hdr "tags: foo, all"
 
 	rxreq
-	txresp -hdr "version: foo_2"
+	txresp -hdr "version: foo_2" -hdr "tags: foo, all"
 
 	rxreq
-	txresp -hdr "version: bar_1"
+	txresp -hdr "version: bar_1" -hdr "tags: bar, all"
 } -start
 
 varnish v1 -vcl+backend {
 import std;
-	include "${pwd}/invalidate_os.vcl";
+	include "${pwd}/invalidate.vcl";
 
 	sub vcl_recv {
-		# let the request decide
-		if (req.http.ignore-host) {
-			set req.http.invalidate-ban-ignore-host = "true";
-		} else {
-			set req.http.invalidate-ban-ignore-host = "false";
-		}
 		# trust everyone
-		set req.http.invalidate-user-authorized = "true";
+		invalidate_opts.set("user-authorized", "true");
 		call invalidate;
+	}
+
+	sub vcl_backend_response {
+		ykey.add_header(beresp.http.tags);
 	}
 } -start
 
@@ -48,7 +46,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# mismatching host, this should have no effect
-	txreq -method BAN -hdr "host: baz.com"
+	txreq -req PURGETAG -hdr "purgetag-list: baz"
 	rxresp
 	expect resp.status == 200
 
@@ -62,8 +60,8 @@ client c1 {
 	expect resp.status == 200
 	expect resp.http.version == "bar_0"
 
-	# ban foo.com
-	txreq -method BAN -hdr "host: foo.com"
+	# ban foo
+	txreq -req PURGETAG -hdr "purgetag-list: foo"
 	rxresp
 	expect resp.status == 200
 
@@ -80,7 +78,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# ban everything
-	txreq -method BAN -hdr "host: foo.com" -hdr "ignore-host: true"
+	txreq -req PURGETAG -hdr "purgetag-list: all"
 	rxresp
 	expect resp.status == 200
 

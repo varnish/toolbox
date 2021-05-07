@@ -1,4 +1,4 @@
-varnishtest "PURGE"
+varnishtest "BAN"
 
 server s1 {
 	rxreq
@@ -12,14 +12,15 @@ server s1 {
 } -start
 
 varnish v1 -vcl+backend {
-	include "${pwd}/invalidate_os.vcl";
+import std;
+	include "${pwd}/invalidate.vcl";
 
 	sub vcl_recv {
 		if (req.http.user == "ok") {
-			set req.http.invalidate-user-authorized = "true";
+			invalidate_opts.set("user-authorized", "true");
 		}
 		if (req.http.method == "nok") {
-			set req.http.invalidate-purge-allow = "false";
+			invalidate_opts.set("ban-allow", "false");
 		}
 		call invalidate;
 	}
@@ -29,13 +30,13 @@ varnish v1 -cliok "param.set debug +syncvsl"
 
 client c1 {
 	# get an object in the cache
-	txreq
+	txreq -url "/bar"
 	rxresp
 	expect resp.status == 200
 	expect resp.http.version == "0"
 
 	# check it's cached
-	txreq
+	txreq -url "/bar"
 	rxresp
 	expect resp.status == 200
 	expect resp.http.version == "0"
@@ -46,32 +47,32 @@ client c1 {
 	expect resp.status == 200
 	expect resp.http.version == "1"
 
-	# purge it without the ok header
-	txreq -method PURGE
+	# ban it without the ok header
+	txreq -req BAN
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
 	# try to be clever as sneak the invalidate-user-authorized header in
-	txreq -method PURGE -hdr "invalidate-user-authorized: true"
+	txreq -req BAN -hdr "invalidate-user-authorized: true"
 	rxresp
 	expect resp.status == 405
 	expect resp.body == "Unauthorized request"
 
-	# try to purge, but PURGE is now forbidden
-	txreq -method PURGE -hdr "user: ok" -hdr "method: nok"
+	# try to ban, but BAN is now forbidden
+	txreq -req BAN -hdr "user: ok" -hdr "method: nok"
 	rxresp
 	expect resp.status == 405
-	expect resp.body == "PURGE is disabled on this host"
+	expect resp.body == "BAN is disabled on this host"
 
-	# purge for good
-	txreq -method PURGE -hdr "user: ok"
+	# ban for good
+	txreq  -url "/bar" -req BAN -hdr "user: ok"
 	rxresp
 	expect resp.status == 200
-	expect resp.body == "Successful purge request"
+	expect resp.body == "Successful ban request"
 
 	# get a new version
-	txreq
+	txreq -url "/bar"
 	rxresp
 	expect resp.status == 200
 	expect resp.http.version == "2"

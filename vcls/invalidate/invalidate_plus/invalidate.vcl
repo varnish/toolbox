@@ -1,5 +1,7 @@
+import aclplus;
 import kvstore;
 import std;
+import str;
 import ykey;
 
 # by leveraging kvstore we won't need to use headers to carry option values,
@@ -17,11 +19,43 @@ sub vcl_init {
 	invalidate_opts.set("ban-ignore-host", "false");
 	// the default is to not trust a request, until told otherwise
 	invalidate_opts.set("user-authorized", "false");
+	// no token and no ACL to check by default
+	invalidate_opts.set("bearer-token", "");
+	invalidate_opts.set("ip-acl", "");
 }
 
 // each implementation will check if the user is authorized and if the method
 // is enabled
-sub invalidate_method_check {
+sub invalidate_check {
+	// if user-authorized == true trust it, otherwise, if there's either
+	// bearer-token or ip-acl, test against them
+	if (invalidate_opts.get("user-authorized") != "true" &&
+	    (invalidate_opts.get("bearer-token", "") != "" ||
+	     invalidate_opts.get("ip-acl", "") != "")) {
+		if (invalidate_opts.get("bearer-token", "") != "") {
+			if (!req.http.authorization) {
+				invalidate_opts.set("message", "Missing Authorization header");
+				return (synth(405));
+			}
+			// we want a bearer token
+			if (std.tolower(str.split(req.http.authorization, 1)) != "bearer") {
+				invalidate_opts.set("message", "Invalid Authorization type");
+				return (synth(405));
+			}
+			// token needs to match
+			if (str.split(req.http.authorization, 2) !=  invalidate_opts.get("bearer-token")) {
+				invalidate_opts.set("message", "Invalid bearer token");
+				return (synth(405));
+			}
+		}
+		if (invalidate_opts.get("ip-acl", "") != "") {
+			if (!aclplus.match(client.ip, invalidate_opts.get("ip-acl", ""))) {
+				invalidate_opts.set("message", "Unauthorized IP");
+				return (synth(405));
+			}
+		}
+		invalidate_opts.set("user-authorized", "true");
+	}
 	if (invalidate_opts.get("user-authorized") != "true") {
 		invalidate_opts.set("message", "Unauthorized request");
 		return (synth(405));
@@ -37,11 +71,11 @@ sub invalidate {
 	// for each method, check if the configuration allows it, and invalidate
 	// according to it, setting req.http.invalidate-message
 	if (req.method == "PURGE") {
-		call invalidate_method_check;
+		call invalidate_check;
 		invalidate_opts.set("message", "Successful purge request");
 		return (purge);
 	} else if (req.method == "BAN") {
-		call invalidate_method_check;
+		call invalidate_check;
 		if (invalidate_opts.get("ban-ignore-host") == "true") {
 			ban("obj.http.invalidate-url ~ ^" + req.url);
 		} else {
@@ -50,12 +84,12 @@ sub invalidate {
 		invalidate_opts.set("message", "Successful ban request");
 		return (synth(200));
 	} else if (req.method == "PURGEALL") {
-		call invalidate_method_check;
+		call invalidate_check;
 		ban("obj.status != 0");
 		invalidate_opts.set("message", "Successful purgeall request");
 		return (synth(200));
 	} else if (req.method == "PURGETAG") {
-		call invalidate_method_check;
+		call invalidate_check;
 		invalidate_opts.set("message", "Successful purgetag request: " + ykey.purge_header(req.http.purgetag-list) + " objects removed");
 		return (synth(200));
 	}
@@ -86,6 +120,7 @@ sub vcl_deliver {
 // usual function
 sub vcl_synth {
 	if (invalidate_opts.get("message")) {
+		std.log("invalidate: " + invalidate_opts.get("message"));
 		synthetic (invalidate_opts.get("message"));
 		return (deliver);
 	}

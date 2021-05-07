@@ -1,4 +1,4 @@
-varnishtest "BAN "
+varnishtest "PURGEALL"
 
 server s1 {
 	rxreq
@@ -16,11 +16,11 @@ server s1 {
 
 varnish v1 -vcl+backend {
 import std;
-	include "${pwd}/invalidate_os.vcl";
+	include "${pwd}/invalidate.vcl";
 
 	sub vcl_recv {
 		# trust everyone
-		set req.http.invalidate-user-authorized = "true";
+		invalidate_opts.set("user-authorized", "true");
 		call invalidate;
 	}
 } -start
@@ -39,7 +39,7 @@ client c1 {
 	expect resp.http.version == "bar_0"
 
 	# purgeall the cache
-	txreq -method PURGEALL
+	txreq -req PURGEALL
 	rxresp
 	expect resp.status == 200
 
