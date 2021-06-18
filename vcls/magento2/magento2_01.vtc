@@ -1,0 +1,84 @@
+varnishtest "regular tag purging"
+
+server s1 {
+	rxreq
+	expect req.url == "/first"
+	txresp -hdr "X-Magento-Tags: foo, bar, baz" -body "first_1"
+
+	rxreq
+	expect req.url == "/second"
+	txresp -hdr "X-Magento-Tags: baz, qux" -body "second_1"
+
+	rxreq
+	expect req.url == "/first"
+	txresp -hdr "X-Magento-Tags: foo, bar, baz" -body "first_2"
+
+	rxreq
+	expect req.url == "/first"
+	txresp -hdr "X-Magento-Tags: foo, bar, baz" -body "first_3"
+
+	rxreq
+	expect req.url == "/second"
+	txresp -hdr "X-Magento-Tags: foo, bar, baz" -body "second_2"
+} -start
+
+shell {
+	# resolve a few variables, and set a "bad" backend"
+	sed -e 's@{{ host }}:{{ port }}@0:0@' \
+	    -e 's@/\* {{ ips }} \*/@"0"/0; "::1"/0;@' \
+	    -e 's@/\* {{ ssl_offloaded_header }} \*/@ssl_o_h@' \
+	    -e 's@/\* {{ grace_period }} \*/@10@' \
+	    ${pwd}/default.vcl > ${tmpdir}/default.vcl
+	    cat ${tmpdir}/default.vcl
+}
+
+varnish v1 -vcl+backend {
+	include "${tmpdir}/default.vcl";
+
+	# override the backend to use s1
+	sub vcl_backend_fetch {
+		set bereq.backend = s1;
+	}
+} -start
+
+client c1 {
+	txreq -url "/first"
+	rxresp
+	expect resp.body == "first_1"
+
+	txreq -url "/first"
+	rxresp
+	expect resp.body == "first_1"
+
+	txreq -url "/second"
+	rxresp
+	expect resp.body == "second_1"
+
+	txreq -req "PURGE" -hdr "X-Magento-Tags-Pattern: ((^|,)bar(,|$))"
+	rxresp
+	expect resp.reason == "Purged"
+
+	txreq -url "/first"
+	rxresp
+	expect resp.body == "first_2"
+
+	txreq -url "/first"
+	rxresp
+	expect resp.body == "first_2"
+
+	txreq -url "/second"
+	rxresp
+	expect resp.body == "second_1"
+
+	txreq -req "PURGE" -hdr "X-Magento-Tags-Pattern: ((^|,)baz(,|$))|((^|,)something_else(,|$))"
+	rxresp
+	expect resp.reason == "Purged"
+
+	txreq -url "/first"
+	rxresp
+	expect resp.body == "first_3"
+
+	txreq -url "/second"
+	rxresp
+	expect resp.body == "second_2"
+} -run
