@@ -29,10 +29,6 @@ sub vcl_init {
 sub vcl_recv {
     set req.backend_hint = dir.backend();
 
-    if (req.restarts > 0) {
-        set req.hash_always_miss = true;
-    }
-
     if (req.method == "PURGE") {
         if (client.ip !~ purge) {
             return (synth(405, "Method not allowed"));
@@ -86,7 +82,14 @@ sub vcl_recv {
         return (pass);
     }
 
-    # Set initial grace period usage status
+    # if the backend is healthy, limit the grace
+    if (std.healthy(req.backend_hint)) {
+        set req.grace = /* {{ grace_period }} */s;
+        set req.http.grace = "normal (healthy server)";
+    } else {
+        set req.http.grace = "unlimited (unhealthy server)";
+    }
+
     set req.http.grace = "none";
 
     # normalize url in case of leading HTTP scheme and domain
@@ -218,22 +221,9 @@ sub vcl_deliver {
 }
 
 sub vcl_hit {
+    # Hit within TTL period
     if (obj.ttl >= 0s) {
-        # Hit within TTL period
-        return (deliver);
-    }
-    if (std.healthy(req.backend_hint)) {
-        if (obj.ttl + /* {{ grace_period }} */s > 0s) {
-            # Hit after TTL expiration, but within grace period
-            set req.http.grace = "normal (healthy server)";
-            return (deliver);
-        } else {
-            # Hit after TTL and grace expiration
-            return (restart);
-        }
-    } else {
-        # server is not healthy, retrieve from cache
-        set req.http.grace = "unlimited (unhealthy server)";
+        set req.http.grace = "none";
         return (deliver);
     }
 }
