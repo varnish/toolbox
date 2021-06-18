@@ -2,6 +2,7 @@ vcl 4.1;
 
 import goto;
 import std;
+import ykey;
 
 # For SSL offloading, pass the following header in your proxy server or load balancer: '/* {{ ssl_offloaded_header }} */: https'
 
@@ -43,10 +44,18 @@ sub vcl_recv {
             return (synth(400, "X-Magento-Tags-Pattern or X-Pool header required"));
         }
         if (req.http.X-Magento-Tags-Pattern) {
-          ban("obj.http.X-Magento-Tags ~ " + req.http.X-Magento-Tags-Pattern);
+            set req.http.X-Magento-Tags-Pattern = regsuball(req.http.X-Magento-Tags-Pattern, "\(\(\^\|\,\)", " ");
+            set req.http.X-Magento-Tags-Pattern = regsuball(req.http.X-Magento-Tags-Pattern, "\(\,\|\$\)\)", "");
+            set req.http.X-Magento-Tags-Pattern = regsuball(req.http.X-Magento-Tags-Pattern, "\|", ",");
+            ykey.purge_keys(req.http.X-Magento-Tags-Pattern);
         }
         if (req.http.X-Pool) {
-          ban("obj.http.X-Pool ~ " + req.http.X-Pool);
+            set req.http.X-Pool = regsuball(req.http.X-Pool, "\(\(\^\|\,\)", " ");
+            set req.http.X-Pool = regsuball(req.http.X-Pool, "\(\,\|\$\)\)", "");
+            set req.http.X-Pool = regsuball(req.http.X-Pool, "\|", ",");
+            ykey.namespace("pool");
+            ykey.purge_keys(req.http.X-Pool);
+            ykey.namespace_reset();
         }
         return (synth(200, "Purged"));
     }
@@ -128,6 +137,11 @@ sub vcl_hash {
 }
 
 sub vcl_backend_response {
+    # tag the object to purge it later
+    ykey.add_header(beresp.http.X-Magento-Tags);
+    ykey.namespace("pool");
+    ykey.add_header(beresp.http.X-Pool);
+    ykey.namespace_reset();
 
     set beresp.grace = 3d;
 
