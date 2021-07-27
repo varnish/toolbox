@@ -5,7 +5,7 @@ directory aims to provide a reference implementation for the most common ones,
 in an easily integrable package.
 
 You'll find two folders: `invalidate_os/` targets the open-source
-version of Varnish Cache, and `invalidate_plus/` target the Enterprise
+version of Varnish Cache, and `invalidate_plus/` targets the Enterprise
 version, Varnish Cache Plus.
 
 Both implement the same HTTP interface, but invalidate_plus/invalidate.vcl`
