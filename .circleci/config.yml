@@ -27,9 +27,33 @@ jobs:
       - run: |
           cd bob
           bob_testdir/test.sh
+  install-vmod:
+    docker:
+      - image: debian:buster
+    steps:
+      - checkout
+      - run: |
+          apt-get update
+          apt-get -qy install curl
+          curl -s https://packagecloud.io/install/repositories/varnishcache/varnish71/script.deb.sh | bash
+          apt-get install -qy automake build-essential libtool-bin python3-docutils varnish varnish-dev
+          cd install-vmod
+
+          VMOD_DYNAMIC_VERSION=2.6.0
+          VMOD_DYNAMIC_COMMIT=9666973952f62110c872d720af3dae0b85b4b597
+          VMOD_DYNAMIC_SHA512SUM=e62f1ee801ab2c9e22f5554bbe40c239257e2c46ea3d2ae19b465b1c82edad6f675417be8f7351d4f9eddafc9ad6c0149f88edc44dd0b922ad82e5d75b6b15a5
+          ./install-vmod https://github.com/nigoroll/libvmod-dynamic/archive/$VMOD_DYNAMIC_COMMIT.tar.gz $VMOD_DYNAMIC_SHA512SUM
+
+          VARNISH_MODULES_COMMIT=0329e2549c31129b35ce163f024f298b10d6551a
+          VARNISH_MODULES_SHA512SUM=526a19a51143174d63ca27f43fa4da713e00301ae89335bb794c34971729a630ad7ee33b4fea374059ea141bfc432b5f93632d83da06a179c8046da9dbb9f525
+          ./install-vmod https://github.com/varnish/varnish-modules/archive/$VARNISH_MODULES_COMMIT.tar.gz $VARNISH_MODULES_SHA512SUM
+
+          echo -e 'vcl 4.1; import var; import dynamic; backend be none;' > /tmp/test.vcl
+          varnishd -C -f /tmp/test.vcl
 
 workflows:
   build:
     jobs:
       - bob
       - build
+      - install-vmod
