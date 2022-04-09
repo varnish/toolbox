@@ -1,5 +1,5 @@
+version: 2.1
 
-version: 2
 jobs:
   build:
     docker:
@@ -16,7 +16,7 @@ jobs:
           name: Build and test
           command: |
             cd prometheus-vstat
-   bob:
+  bob:
     docker:
       - image: circleci/golang
     steps:
