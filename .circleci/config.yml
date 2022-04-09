@@ -16,6 +16,7 @@ jobs:
           name: Build and test
           command: |
             cd prometheus-vstat
+            make check
   bob:
     docker:
       - image: circleci/golang
@@ -26,7 +27,6 @@ jobs:
       - run: |
           cd bob
           bob_testdir/test.sh
-           make check
 
 workflows:
   build:
