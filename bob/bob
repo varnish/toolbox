@@ -72,7 +72,7 @@ find_root() {
 	IFS=:
 	while true; do
 		for dir in $BOB_PATH; do
-			if [ -f "$dir/Dockerfile" ]; then
+			if [ -f "$dir/$DOCKERFILE" ]; then
 				BOB_DIR="$dir"
 				break 2
 			fi
