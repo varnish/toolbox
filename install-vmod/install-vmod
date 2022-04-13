@@ -37,7 +37,7 @@ check_bin() {
 check_bin automake --version
 check_bin curl --version
 check_bin gcc --version
-check_bin libtool --version
+check_bin libtoolize --version
 check_bin make --version
 check_bin nproc
 check_bin pkg-config --version
