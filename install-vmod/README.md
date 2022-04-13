@@ -26,10 +26,10 @@ Make sure you have the following installed:
 From there, you can run
 
 ``` bash
-install-vmod TARBALL_URL SHA512SUM
+install-vmod TARBALL [SHA512SUM]
 ```
 
-`TARBALL_URL` is the url to the tarball for the vmod you want to compile.
+`TARBALL` is the local path or remote url of the tarball for the vmod you want to compile.
 The tarball is assumed to only have one directory in it.
 
 `SHA512SUM` is an optional `sha512` checksum to validate the tarball against.
