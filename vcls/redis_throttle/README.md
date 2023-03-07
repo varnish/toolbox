@@ -15,6 +15,6 @@ to keep track of the various quotas to enforce.
 
 To use this VCL:
 - install `vmod_redis`, for example using [easy_install](https://github.com/varnish/toolbox/tree/master/easy_install).
-- open `redis_throttle.vtc` and edit it in all the places commented with `# EDIT` 
-- copy `redis_throttle.vtc` in `/etc/varnish` on your server
-- in your own VCL (probably `/etc/varnish/default.vcl`), add `include "redis_throttle.vtc"` near the top
+- open `redis_throttle.vcl` and edit it in all the places commented with `# EDIT` 
+- copy `redis_throttle.vcl` in `/etc/varnish` on your server
+- in your own VCL (probably `/etc/varnish/default.vcl`), add `include "redis_throttle.vcl"` right after (the `vcl 4.x` line)
