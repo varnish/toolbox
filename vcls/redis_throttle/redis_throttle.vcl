@@ -3,7 +3,7 @@ import redis;
 
 # EDIT initialize vmod_redis, telling it where your redis database is
 sub vcl_init {
-    new db = redis.db(location="127.0.01:6379");
+    new db = redis.db(location="127.0.0.1:6379");
 }
 
 sub vcl_recv {
