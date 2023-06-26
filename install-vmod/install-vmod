@@ -6,6 +6,8 @@ usage() {
 	cat << EOF
 usage:
     install_vmod URL [SHA512SUM]
+environment variables:
+    SKIP_CHECK: if non-empty, tests are not run before installing
 deps:
 - varnish development files
 - curl
@@ -98,7 +100,9 @@ else
 	./configure
 fi
 
-make -j"$(nproc)" VERBOSE=1 check
+if [ -z "$SKIP_CHECK" ]; then
+	make -j"$(nproc)" VERBOSE=1 check
+fi
 make -j"$(nproc)" VERBOSE=1 install
 
 rm -rf /tmp/module_to_build 
