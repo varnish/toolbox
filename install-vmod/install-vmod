@@ -9,15 +9,15 @@ usage:
 environment variables:
     SKIP_CHECK: if non-empty, tests are not run before installing
 deps:
-- varnish development files
-- curl
-- pkg-config
-- nproc
-- make
-- gcc
-- automake
-- libtoolize
-- whatever dependencies the vmod needs
+    - varnish development files
+    - curl
+    - pkg-config
+    - nproc
+    - make
+    - gcc
+    - automake
+    - libtoolize
+    - whatever dependencies the vmod needs
 EOF
 	exit $1
 }
