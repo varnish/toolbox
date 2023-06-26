@@ -86,12 +86,18 @@ tar xavf src.tar.gz --strip 1
 if [ ! -x configure ]; then
 	if [ -e autogen.sh ]; then
 		./autogen.sh
+		./configure
 	elif [ -e bootstrap ]; then
 		./bootstrap
+		# bootstrap may or may not have called configure
+		if [ ! -e Makefile ]; then
+			./configure
+		fi
 	fi
+else
+	./configure
 fi
 
-./configure
 make -j"$(nproc)" VERBOSE=1 check
 make -j"$(nproc)" VERBOSE=1 install
 
