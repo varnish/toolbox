@@ -36,14 +36,7 @@ check_bin() {
 	fi
 }
 
-check_bin automake --version
 check_bin curl --version
-check_bin gcc --version
-check_bin libtoolize --version
-check_bin make --version
-check_bin nproc
-check_bin pkg-config --version
-check_bin rst2man --version
 check_bin tar --version
 
 if ! pkg-config varnishapi; then
@@ -85,24 +78,48 @@ if [ -n "$SHA512SUM" ]; then
 fi
 tar xavf src.tar.gz --strip 1
 
-if [ ! -x configure ]; then
-	if [ -e autogen.sh ]; then
-		./autogen.sh
-		./configure
-	elif [ -e bootstrap ]; then
-		./bootstrap
-		# bootstrap may or may not have called configure
-		if [ ! -e Makefile ]; then
-			./configure
-		fi
-	fi
+if [ -e Cargo.toml ]; then
+	check_bin cargo
+	cargo build --release
 else
-	./configure
+	check_bin automake --version
+	check_bin gcc --version
+	check_bin libtoolize --version
+	check_bin make --version
+	check_bin nproc
+	check_bin pkg-config --version
+	check_bin rst2man --version
+
+	if [ ! -x configure ]; then
+		if [ -e autogen.sh ]; then
+			./autogen.sh
+			./configure
+		elif [ -e bootstrap ]; then
+			./bootstrap
+			# bootstrap may or may not have called configure
+			if [ ! -e Makefile ]; then
+				./configure
+			fi
+		fi
+	else
+		./configure
+	fi
 fi
 
 if [ -z "$SKIP_CHECK" ]; then
-	make -j"$(nproc)" VERBOSE=1 check
+	if [ -e Cargo.toml ]; then
+		cargo test --release
+	else
+		make -j"$(nproc)" VERBOSE=1 check
+	fi
 fi
-make -j"$(nproc)" VERBOSE=1 install
+
+if [ -e Cargo.toml ]; then
+	PKG="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name')"
+	VMODDIR="$(pkg-config  --variable=vmoddir varnishapi)"
+	cp target/release/lib$PKG.so "$VMODDIR"
+else
+	make -j"$(nproc)" VERBOSE=1 install
+fi
 
 rm -rf /tmp/module_to_build 
