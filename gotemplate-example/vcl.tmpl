@@ -1,0 +1,38 @@
+vcl 4.1;
+
+import directors;
+
+# first, declare all our backends
+{{ range $name, $backend := .backends -}}
+backend {{ $name }} {
+    .host = "{{ $backend.ip }}";
+    .port = "{{ or $backend.port 80}}";
+}
+{{- end }}
+
+# aggregate all backends into a round-robin director
+sub vcl_init {
+    new rr = directors.round_robin();
+    {{ range $name, $backend := .backends }}
+    rr.add_backend({{ $name }});
+    {{- end }}
+}
+
+# use that director for all requests
+sub vcl_recv {
+    set req.backend_hint = rr.backend();
+}
+
+# set TTL when the backend gets back to us
+sub vcl_backend_response {
+    set beresp.ttl = {{ .ttl }};
+}
+
+sub vcl_deliver {
+	{{ if eq .env "prod" -}}
+	unset resp.http.x-varnish;
+	unset resp.http.server;
+	{{- else -}}
+	set resp.http.x-debug = "served from a templated VCL";
+	{{- end }}
+}

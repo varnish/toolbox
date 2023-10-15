@@ -1,0 +1,16 @@
+# env can be either "prod" or "dev"
+# dictates whether we filter some headers or not
+env: prod
+
+# which TTL to apply to cached object
+# it's a string, following the VCL_DURATION format
+ttl: 4s
+
+# map of backends, containing their IP an optionally
+# a port (80 by default)
+backends:
+  america_1:
+    ip: 12.12.12.12
+    port: 8888
+  india_2:
+    ip: 34.34.34.34
