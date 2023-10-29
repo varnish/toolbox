@@ -1,0 +1,53 @@
+varnishtest "Time measurement"
+
+server s1 {
+	rxreq
+	delay 1
+	txresp -hdr "version: 0"
+
+	rxreq
+	delay 2
+	txresp -hdr "version: 1"
+} -start
+
+varnish v1 -vcl+backend {
+	# include the VCL, but you can also copy-paste it in here
+	include "${pwd}/timing.vcl";
+
+	sub vcl_recv {
+		# provide a away to test vcl_synth
+		if (req.url == "/synth") {
+			return (synth(200));
+		}
+	}
+} -start
+
+varnish v1 -cliok "param.set debug +syncvsl"
+
+client c1 {
+	# synthetic response should be fast
+	txreq -url "/synth"
+	rxresp
+	expect resp.http.recv-to-deliver-duration == <undef>
+	expect resp.http.recv-to-synth-duration < 0.2
+
+	# first backend response is slow (because of `delay 1`)
+	txreq -url "/foo"
+	rxresp
+	expect resp.http.recv-to-deliver-duration >= 1
+	expect resp.http.recv-to-deliver-duration < 1.2
+	expect resp.http.recv-to-synth-duration == <undef>
+
+	# cached response is fast
+	txreq -url "/foo"
+	rxresp
+	expect resp.http.recv-to-deliver-duration < 0.2
+	expect resp.http.recv-to-synth-duration == <undef>
+
+	# second backend response is slower
+	txreq -url "/bar"
+	rxresp
+	expect resp.http.recv-to-deliver-duration >= 2
+	expect resp.http.recv-to-deliver-duration < 2.2
+	expect resp.http.recv-to-synth-duration == <undef>
+} -run
