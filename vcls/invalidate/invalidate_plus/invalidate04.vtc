@@ -19,7 +19,7 @@ server s1 {
 
 varnish v1 -vcl+backend {
 import std;
-	include "${pwd}/invalidate.vcl";
+	include "${testdir}/invalidate.vcl";
 
 	sub vcl_recv {
 		# trust everyone

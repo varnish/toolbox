@@ -28,7 +28,7 @@ shell {
 	    -e 's@/\* {{ ips }} \*/@"0"/0; "::1"/0;@' \
 	    -e 's@/\* {{ ssl_offloaded_header }} \*/@ssl_o_h@' \
 	    -e 's@/\* {{ grace_period }} \*/@10@' \
-	    ${pwd}/default.vcl > ${tmpdir}/default.vcl
+	    ${testdir}/default.vcl > ${tmpdir}/default.vcl
 	    cat ${tmpdir}/default.vcl
 }
 

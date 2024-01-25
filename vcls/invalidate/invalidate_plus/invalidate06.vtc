@@ -5,7 +5,7 @@ server s1 {} -start
 # token only
 varnish v1 -proto "PROXY" -vcl+backend {
 import std;
-	include "${pwd}/invalidate.vcl";
+	include "${testdir}/invalidate.vcl";
 
 	sub vcl_recv {
 		invalidate_opts.set("bearer-token", "myToken");
@@ -32,7 +32,7 @@ client c1 -proxy2 "1.2.3.4:2314 5.6.7.8:80" {
 # ACL only
 varnish v1 -vcl+backend {
 import std;
-	include "${pwd}/invalidate.vcl";
+	include "${testdir}/invalidate.vcl";
 
 	sub vcl_recv {
 		invalidate_opts.set("ip-acl", "!1.2.3.6, 1.2.3.0/24");
@@ -63,7 +63,7 @@ client c1 -proxy2 "1.1.1.1:2314 5.6.7.8:80" {
 # token + ACL
 varnish v1 -vcl+backend {
 import std;
-	include "${pwd}/invalidate.vcl";
+	include "${testdir}/invalidate.vcl";
 
 	sub vcl_recv {
 		invalidate_opts.set("bearer-token", "myToken");

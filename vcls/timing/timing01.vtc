@@ -12,7 +12,7 @@ server s1 {
 
 varnish v1 -vcl+backend {
 	# include the VCL, but you can also copy-paste it in here
-	include "${pwd}/timing.vcl";
+	include "${testdir}/timing.vcl";
 
 	sub vcl_recv {
 		# provide a away to test vcl_synth

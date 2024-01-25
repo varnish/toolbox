@@ -7,7 +7,7 @@ server s1 {
 } -start
 
 varnish v1 -proto "PROXY" -vcl+backend {
-	include "${pwd}/redirect.vcl";
+	include "${testdir}/redirect.vcl";
 
 	sub vcl_recv {
 		# forget the location
