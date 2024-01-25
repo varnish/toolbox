@@ -1,0 +1,39 @@
+varnishtest "Hit-miss"
+
+server s1 {
+	rxreq
+	txresp
+
+	rxreq
+	txresp
+
+	rxreq
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+	include "${testdir}/hit-miss.vcl";
+
+	sub vcl_backend_response {
+		if (bereq.url == "/cacheable") {
+			set beresp.ttl = 5s;
+			set beresp.grace = 2m;
+		} else {
+			set beresp.uncacheable = true;
+		}
+	}
+} -start
+
+client c1 {
+	txreq -url "/cacheable"
+	rxresp
+	expect resp.http.x-cache == "miss cached"
+
+	txreq -url "/cacheable"
+	rxresp
+	expect resp.http.x-cache == "hit cached"
+
+	txreq -url "/uncacheable"
+	rxresp
+	expect resp.http.x-cache == "miss uncacheable"
+} -run
