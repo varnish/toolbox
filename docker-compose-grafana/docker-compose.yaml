@@ -1,0 +1,81 @@
+services:
+  load_generator:
+    image: curlimages/curl
+    volumes:
+      - ./load_generator.sh:/usr/bin/load_generator
+    command: /usr/bin/load_generator
+    depends_on:
+      - varnish
+
+  varnish:
+    image: varnish
+    command: -n varnish
+    volumes:
+      - workdir:/var/lib/varnish
+      - ${VARNISH_VCL}:/etc/varnish/default.vcl
+    ports:
+      - "${HTTP_PORT}:80"
+    depends_on:
+      - origin
+
+  origin:
+    image: python
+    command: python -m http.server --directory /orig_data 80
+    volumes:
+      - ${ORIGIN_DATA}:/orig_data
+
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - 3000:${GRAFANA_PORT}
+    volumes:
+      - ${GRAFANA_CONF}:/etc/grafana/grafana.ini
+      - ${GRAFANA_PROVISIONING}:/etc/grafana/provisioning/
+
+  exporter:
+    image: stat-exporter
+    command: /tmp/prometheus_varnish_exporter -n varnish -verbose
+    volumes:
+      - workdir:/var/lib/varnish
+    depends_on:
+      - varnish
+    build:
+      dockerfile_inline: |
+        FROM curlimages/curl
+        RUN set -ex; \
+            cd /tmp/; \
+            curl -L https://github.com/jonnenauha/prometheus_varnish_exporter/releases/download/1.6.1/prometheus_varnish_exporter-1.6.1.linux-amd64.tar.gz | tar xvzf - --strip 1
+        FROM varnish
+        COPY --from=0 /tmp/prometheus_varnish_exporter /tmp/prometheus_varnish_exporter
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ${PROMETHEUS_CONF}:/etc/prometheus/prometheus.yml
+
+  loki:
+    image: grafana/loki:2.9.0
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: ncsa-promtail
+    entrypoint: ""
+    command: bash -c "varnishncsa -n varnish | promtail -config.file=/etc/promtail/config.yml --stdin"
+    volumes:
+      - ./conf/promtail-config.yaml:/etc/promtail/config.yml
+      - workdir:/var/lib/varnish
+    build:
+      dockerfile_inline: |
+        FROM curlimages/curl
+        RUN set -ex; \
+            curl -sLo https://github.com/grafana/loki/releases/download/v2.8.7/promtail-linux-amd64.zip | unzip -d /tmp -; \
+
+        FROM varnish
+        COPY --from=0 --chmod=555 /tmp/promtail-linux-amd64 /tmp/promtail
+
+volumes:
+  workdir:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
