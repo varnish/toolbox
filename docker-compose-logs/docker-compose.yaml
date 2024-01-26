@@ -8,6 +8,7 @@ services:
       - "${HTTP_PORT}:80"
     depends_on:
       - origin
+
   hitch:
     image: hitch
     volumes:
@@ -17,6 +18,7 @@ services:
       - "${HTTPS_PORT}:443"
     depends_on:
       - varnish
+
   varnishncsa:
     image: varnish
     volumes:
@@ -27,6 +29,7 @@ services:
       - -a
       - -w
       - /var/log/varnish/${NCSA_LOG}
+
   varnishlog:
     image: varnish
     volumes:
@@ -37,6 +40,7 @@ services:
       - -a
       - -w
       - /var/log/varnish/${BIN_LOG}
+
   origin:
     image: python
     volumes:
