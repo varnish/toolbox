@@ -1,4 +1,4 @@
-# Redirect VCL
+# Hit-miss VCL
 
 Full tutorial on the [Varnish Software docs website](https://docs.varnish-software.com/tutorials/hit-miss-logging/)
 
