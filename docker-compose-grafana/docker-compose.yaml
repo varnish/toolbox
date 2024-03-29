@@ -68,7 +68,7 @@ services:
       dockerfile_inline: |
         FROM curlimages/curl
         RUN set -ex; \
-            curl -sLo https://github.com/grafana/loki/releases/download/v2.8.7/promtail-linux-amd64.zip | unzip -d /tmp -; \
+            curl -sL https://github.com/grafana/loki/releases/download/v2.8.7/promtail-linux-amd64.zip | unzip -d /tmp -
 
         FROM varnish
         COPY --from=0 --chmod=555 /tmp/promtail-linux-amd64 /tmp/promtail
