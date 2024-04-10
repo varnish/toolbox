@@ -1,0 +1,31 @@
+services:
+  # our origin server, serving ./data/ by default
+  # make sure you populated it before running docker compose
+  origin:
+    image: python
+    volumes:
+      - ${ORIGIN_DATA}:/orig_data
+    command:
+      - python
+      - -m
+      - http.server
+      - --directory
+      - /orig_data
+      - "80"
+    stop_grace_period: 1s
+
+  live_converter:
+    image: linuxserver/ffmpeg
+    volumes:
+      - ${ORIGIN_DATA}:/output
+      - ./build_live_hls.sh:/build_live_hls.sh
+    entrypoint: ""
+    command: /build_live_hls.sh
+
+  # Varnish with a simple VCL to server our video via any site
+  varnish:
+    image: varnish
+    volumes:
+      - ${VARNISH_VCL}:/etc/varnish/default.vcl
+    ports:
+      - ${HTTP_PORT}:80
