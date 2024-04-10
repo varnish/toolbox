@@ -60,7 +60,7 @@ services:
   promtail:
     image: ncsa-promtail
     entrypoint: ""
-    command: bash -c "varnishncsa -n varnish | promtail -config.file=/etc/promtail/config.yml --stdin"
+    command: bash -c "varnishncsa -t off -n varnish | /tmp/promtail -config.file=/etc/promtail/config.yml --stdin"
     volumes:
       - ./conf/promtail-config.yaml:/etc/promtail/config.yml
       - workdir:/var/lib/varnish
