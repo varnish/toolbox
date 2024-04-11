@@ -31,7 +31,7 @@ responses.
 ``` vcl
 vcl 4.1;
 
-include "redirect.vcl"
+include "timing.vcl"
 
 // rest of our VCL below
 ```
