@@ -7,14 +7,14 @@ include "cluster.vcl";
 backend default { .host = "origin:80"; }
 
 sub vcl_init {
-  new cluster_group = activedns.dns_group("varnish:6081");
+  new cluster_group = activedns.dns_group("cache:6081");
   cluster.subscribe(cluster_group.get_tag());
 
   cluster_opts.set("token", "my_very_secret_secret");
 }
 
-sub vcl_backend_fetch {
-  set bereq.backend = default;
+sub vcl_recv {
+  set req.backend_hint = default;
 }
 
 sub vcl_backend_response {

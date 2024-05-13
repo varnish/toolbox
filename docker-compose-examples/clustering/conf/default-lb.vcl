@@ -18,6 +18,18 @@ sub vcl_init {
 }
 
 sub vcl_recv {
+  if (req.url == "/refresh/host") {
+    caches_group.refresh(host);
+    return (synth(200));
+  }
+  if (req.url == "/refresh/cache") {
+    caches_group.refresh(cache);
+    return (synth(200));
+  }
+  if (req.url == "/refresh/info") {
+    caches_group.refresh(info);
+    return (synth(200));
+  }
   set req.backend_hint = caches.backend();
   return (pass);
 }

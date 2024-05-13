@@ -1,11 +1,15 @@
 services:
   load_generator:
-    image: curlimages/curl
+    image: python-load
     volumes:
-      - ./load_generator.sh:/usr/bin/load_generator
+      - ./load_generator.py:/usr/bin/load_generator
     command: /usr/bin/load_generator
     depends_on:
       - varnish
+    build:
+      dockerfile_inline: |
+        FROM python
+        RUN pip install --no-cache-dir requests
 
   varnish:
     image: varnish
@@ -60,7 +64,7 @@ services:
   promtail:
     image: ncsa-promtail
     entrypoint: ""
-    command: bash -c "varnishncsa -t off -n varnish | /tmp/promtail -config.file=/etc/promtail/config.yml --stdin"
+    command: bash -c "varnishlog-json -t off -n varnish | /tmp/promtail -config.file=/etc/promtail/config.yml --stdin"
     volumes:
       - ./conf/promtail-config.yaml:/etc/promtail/config.yml
       - workdir:/var/lib/varnish
@@ -72,6 +76,15 @@ services:
 
         FROM varnish
         COPY --from=0 --chmod=555 /tmp/promtail-linux-amd64 /tmp/promtail
+        USER root
+        RUN set -ex; \
+          apt-get update; \
+          apt-get -y install /pkgs/*.deb cmake gcc libcjson-dev libcjson1 python3-docutils git; \
+          git clone https://github.com/varnish/varnishlog-json.git; \
+          cd varnishlog-json; \
+          cmake -B build; \
+          cmake --build build/; \
+          mv build/varnishlog-json /usr/bin
 
 volumes:
   workdir:
