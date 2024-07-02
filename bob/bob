@@ -98,6 +98,9 @@ build () {
 	cat <<-'EOF' >> "$TDF"
 	ARG USER
 	ARG UID
+	RUN set -ex; \
+		LOGIN="$( awk -F: '$3 == 1000 { print $1 }' /etc/passwd )"; \
+		[ -n "$LOGIN" ] && userdel $LOGIN
 	RUN if [ "$(. /etc/os-release &> /dev/null && echo ${ID})" = "alpine" ]; then adduser -D -u $UID $USER; else useradd -u $UID $USER; fi
 	EOF
 	docker build --pull --build-arg BASE=$BASE --build-arg USER=$(whoami) --build-arg UID=$(id -u) -t $NAME -f "$TDF" .
