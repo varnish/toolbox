@@ -1,0 +1,14 @@
+services:
+  varnish:
+    image: "quay.io/varnish-software/varnish-plus:latest"
+    volumes:
+      # change the default.vcl
+      - ../default.vcl:/etc/varnish/default.vcl
+      # take the credentials file from your EC2 instance and place it in your working directory
+      - ./s3.conf:/etc/varnish/s3.conf
+    environment:
+      AWS_SHARED_CREDENTIALS_FILE: /etc/varnish/s3.conf
+      AWS_CONFIG_FILE: /etc/varnish/s3.conf
+    ports:
+      # Indicate the desired ports below
+      - 6081:6081

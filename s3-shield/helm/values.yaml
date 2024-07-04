@@ -1,0 +1,24 @@
+server:
+  extraEnvs:
+    AWS_SHARED_CREDENTIALS_FILE: /etc/varnish/aws/s3.conf
+    AWS_CONFIG_FILE: /etc/varnish/aws/s3.conf
+  extraVolumes: |
+    - name: varnish-s3-conf
+      secret:
+        secretName: varnish-s3-conf
+        items:
+          - key: s3.conf
+            path: s3.conf
+    - name: varnish-s3-vcl
+      configMap:
+        name: varnish-s3-vcl
+
+  extraVolumeMounts:
+    - name: varnish-s3-conf
+      mountPath: /etc/varnish/aws/
+      subpath: /etc/varnish/s3.conf
+    - name: varnish-s3-vcl
+      mountPath: /etc/varnish/default.vcl
+      subPath: default.vcl
+
+  vclConfig: ""

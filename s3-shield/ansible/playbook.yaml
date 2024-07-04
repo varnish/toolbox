@@ -1,0 +1,53 @@
+- hosts: s3_shields
+  become: true
+  tasks:
+    - name: "Check that repository_token is set"
+      assert:
+        that:
+          repository_token != ""
+
+    - name: "Install varnish dependencies (debian-based)"
+      when: ansible_os_family == 'Debian' and repository_token != ""
+      ansible.builtin.apt:
+        name:
+          - curl
+          - gnupg
+        state: present
+
+    - name: "Install varnish dependencies (rhel-based)"
+      when: ansible_os_family == 'RedHat' and repository_token != ""
+      ansible.builtin.dnf:
+        name:
+          - curl
+          - gnupg
+        state: present
+
+    - name: "Install varnish"
+      when: repository_token != ""
+      shell:
+        cmd: curl https://docs.varnish-software.com/scripts/setup.sh | TOKEN={{ repository_token }} INSTALL="varnish-plus" bash
+
+    - name: "Create necessary directories"
+      ansible.builtin.file:
+        path: /etc/varnish/.aws/
+        state: directory
+
+    - name: "Copy all VCL and credentials files"
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - src: default-entry.vcl.j2
+          dest: /etc/varnish/default.vcl
+        - src: ../default.vcl
+          dest: /etc/varnish/default-s3.vcl
+        - src: ./s3.conf
+          dest: /etc/varnish/s3.conf
+        - src: ./varnish.service
+          dest: /etc/systemd/system/varnish.service
+
+    - name: "Restart varnish"
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: true
+        name: varnish

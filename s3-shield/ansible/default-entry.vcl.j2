@@ -1,0 +1,10 @@
+vcl 4.1;
+
+include "./default-s3.vcl";
+
+{% for host in vars['play_hosts'] %}
+backend peer_{{ host | replace(".", "_") }} {
+	.host = "{{ host }}";
+}
+sub vcl_init { cluster.add_backend(peer_{{ host | replace(".", "_") }}); }
+{% endfor %}

@@ -1,0 +1,44 @@
+[Unit]
+Description=Varnish Cache Plus, a high-performance HTTP accelerator
+After=network-online.target nss-lookup.target
+
+[Service]
+Type=forking
+KillMode=process
+
+# Maximum number of open files (for ulimit -n)
+LimitNOFILE=131072
+
+# Shared memory (VSM) segments are tentatively locked in memory. The
+# default value for vsl_space (or shorthand varnishd -l option) is 80MB.
+# The default value for vst_space is 10MB, leaving 10MB of headroom.
+# There are other types of segments that would benefit from allowing
+# more memory to be locked.
+LimitMEMLOCK=100M
+
+# Enable this to avoid "fork failed" on reload.
+TasksMax=infinity
+
+# Maximum size of the corefile.
+LimitCORE=infinity
+
+# Maximum number of threads (for ulimit -u)
+LimitNPROC=infinity
+
+Environment=AWS_SHARED_CREDENTIALS_FILE=/etc/varnish/s3.conf
+Environment=AWS_CONFIG_FILE=/etc/varnish/s3.conf
+ExecStart=/usr/sbin/varnishd \
+          -a :80 \
+          -a localhost:8443,proxy \
+          -T localhost:6082 \
+          -S /etc/varnish/secret \
+          -p feature=+http2 \
+          -r vcc_allow_inline_c \
+          -r allow_exec \
+          -f /etc/varnish/default.vcl \
+          -s mse
+ExecReload=/usr/sbin/varnishreload
+
+[Install]
+WantedBy=multi-user.target
+
