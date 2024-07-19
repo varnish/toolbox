@@ -15,7 +15,7 @@
         state: present
 
     - name: "Install varnish dependencies (rhel-based)"
-      when: ansible_os_family == 'RedHat' and repository_token != ""
+      when: ansible_os_family == 'RedHat' repository_token != ""
       ansible.builtin.dnf:
         name:
           - curl
@@ -23,7 +23,7 @@
         state: present
 
     - name: "Install varnish"
-      when: repository_token != ""
+      when: ansible_os_family == 'RedHat' repository_token != ""
       shell:
         cmd: curl https://docs.varnish-software.com/scripts/setup.sh | TOKEN={{ repository_token }} INSTALL="varnish-plus" bash
 
@@ -47,6 +47,25 @@
           dest: /etc/systemd/system/varnish.service
 
     - name: "Restart varnish"
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: true
+        name: varnish
+
+    - name: "Copy MSE configurations"
+      with_items:
+        - src: ./mse.conf
+          dest: /var/lib/mse/mse.conf
+
+    - name: "Initialize MSE configuration"
+      cmd: mkfs.mse -c /var/lib/mse/mse.conf
+
+    - name: "copy service file"
+      with_items:
+        - src: ./varnish-mse.service
+          dest: /etc/systemd/system/varnish.service
+
+    - name: "Restart varnish with mse"
       ansible.builtin.systemd:
         state: restarted
         daemon_reload: true
