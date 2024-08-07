@@ -1,3 +1,7 @@
+---
+global:
+  imagePullSecrets:
+    - name: varnish-pull-secret
 server:
   extraEnvs:
     AWS_SHARED_CREDENTIALS_FILE: /etc/varnish/aws/s3.conf
