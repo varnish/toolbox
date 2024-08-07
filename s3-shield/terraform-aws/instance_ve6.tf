@@ -23,5 +23,6 @@ resource "aws_instance" "tf-ve6" {
   user_data              = "${file("../cloud-init/cloud-init-s3-shield.yaml")}"
   tags = {
     Project = "varnish-s3-shield"
+    Name = "varnish-s3-shield"
   }
 }
