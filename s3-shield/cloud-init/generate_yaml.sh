@@ -3,8 +3,8 @@
 # cd where this script it
 cd $(dirname "$0")
 
-BASE64_VCL=$(gbase64 -w 0 "../default.vcl")
-BASE64_S3CONF=$(gbase64 -w 0 "s3.conf")
+BASE64_VCL=$(base64 -w 0 "../default.vcl")
+BASE64_S3CONF=$(base64 -w 0 "s3.conf")
 INSTALL_VARNISH_TOKEN="$1"
 
 sed -e "s/BASE64_VCL_CONTENT/$BASE64_VCL/" \
