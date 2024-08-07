@@ -18,7 +18,7 @@ write_files:
     Environment="AWS_CONFIG_FILE=/etc/varnish/s3.conf"
     ExecStart=
     ExecStart=/usr/sbin/varnishd -a :80 -a 127.0.0.1:8443,proxy -S /etc/varnish/secret -T localhost:6082 -f /etc/varnish/s3shield.vcl -s mse -p syslog_cli_traffic=off
-  path: /var/tmp/varnish-override.conf
+  path: /etc/systemd/system/varnish.service.d/override.conf
   owner: root:root
   permissions: '0644'
 - content: |
@@ -27,12 +27,14 @@ write_files:
   owner: root:root
   permissions: '0644'
 runcmd:
-  - INSTALL_VARNISH_COMMAND
+  - |
+    TOKEN=INSTALL_VARNISH_TOKEN
+    if [ -n "$TOKEN" ]; then
+      curl https://docs.varnish-software.com/scripts/setup.sh | TOKEN=$TOKEN INSTALL="varnish-plus" bash
+    fi
   - base64 --decode /var/tmp/s3shield.base64 > /etc/varnish/s3shield.vcl
   - base64 --decode /var/tmp/s3conf.base64 > /etc/varnish/s3.conf
   - rm /var/tmp/s3shield.base64 /var/tmp/s3conf.base64
-  - mkdir /etc/systemd/system/varnish.service.d
-  - mv /var/tmp/varnish-override.conf /etc/systemd/system/varnish.service.d/override.conf
   - /usr/bin/systemctl daemon-reload
   - /usr/bin/systemctl restart varnish.service
 
