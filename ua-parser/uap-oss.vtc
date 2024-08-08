@@ -1,0 +1,60 @@
+varnishtest "oss vcl"
+
+varnish v1 -vcl {
+	include "${testdir}/uap-oss.vcl";
+
+	backend default none;
+
+	sub vcl_recv {
+		return (synth(200));
+	}
+
+	sub vcl_synth {
+		call uap_detect;
+		set resp.http.expr = req.http.expr;
+		set resp.http.ua-family = req.http.ua-family;
+		set resp.http.ua-major = req.http.ua-major;
+		set resp.http.ua-minor = req.http.ua-minor;
+		set resp.http.ua-patch = req.http.ua-patch;
+		set resp.http.os-family = req.http.os-family;
+		set resp.http.os-major = req.http.os-major;
+		set resp.http.os-minor = req.http.os-minor;
+		set resp.http.os-patch = req.http.os-patch;
+		set resp.http.os-patch_minor = req.http.os-patch_minor;
+		set resp.http.device-family = req.http.device-family;
+		set resp.http.device-brand = req.http.device-brand;
+		set resp.http.device-model = req.http.device-model;
+	}
+} -start
+
+varnish v1 -cliok "param.set vsl_mask -VCL_use"
+varnish v1 -cliok "param.set vsl_mask -Filters"
+
+varnish v1 -cliok "param.set vsl_mask -RespHeader"
+varnish v1 -cliok "param.set vsl_mask -VCL_return"
+varnish v1 -cliok "param.set vsl_mask -Storage"
+varnish v1 -cliok "param.set vsl_mask -Begin"
+varnish v1 -cliok "param.set vsl_mask -Timestamp"
+varnish v1 -cliok "param.set vsl_mask -ReqAcct"
+varnish v1 -cliok "param.set vsl_mask -End"
+varnish v1 -cliok "param.set vsl_mask -Link"
+varnish v1 -cliok "param.set vsl_mask -ReqStart"
+varnish v1 -cliok "param.set vsl_mask -ReqMethod"
+varnish v1 -cliok "param.set vsl_mask -ReqURL"
+varnish v1 -cliok "param.set vsl_mask -ReqProtocol"
+varnish v1 -cliok "param.set vsl_mask -Debug"
+varnish v1 -cliok "param.set vsl_mask -ReqHeader"
+varnish v1 -cliok "param.set vsl_mask -VCL_call"
+varnish v1 -cliok "param.set vsl_mask -RespProtocol"
+varnish v1 -cliok "param.set vsl_mask -RespStatus"
+varnish v1 -cliok "param.set vsl_mask -Respreason"
+
+shell {
+	${pwd}/uap2vcl-test --tests ${pwd}/test_ua.yaml --type ua --varnish http://${v1_addr}:${v1_port}/
+}
+shell {
+	${pwd}/uap2vcl-test --tests ${pwd}/test_os.yaml --type os --varnish http://${v1_addr}:${v1_port}/
+}
+shell {
+	${pwd}/uap2vcl-test --tests ${pwd}/test_device.yaml --type device --varnish http://${v1_addr}:${v1_port}/
+}

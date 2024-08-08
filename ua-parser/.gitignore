@@ -1,0 +1,7 @@
+regexes.yaml
+test_device.yaml
+test_os.yaml
+test_ua.yaml
+uap-oss.vcl
+uap2vcl
+uap2vcl-test
