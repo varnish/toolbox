@@ -49,7 +49,7 @@ services:
 
   origin-esi:
     <<: *origin
-    command: /app/main origin-files
+    command: /app/main origin-esi
 
   exporter:
     command: varnish-otlp-exporter
