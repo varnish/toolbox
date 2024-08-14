@@ -8,70 +8,110 @@ services:
       - varnish
 
   varnish:
-    image: varnish
-    command: -n varnish
     volumes:
       - workdir:/var/lib/varnish
       - ${VARNISH_VCL}:/etc/varnish/default.vcl
-    ports:
-      - "${HTTP_PORT}:80"
     depends_on:
-      - origin
+      - origin-files
+      - origin-esi
+    build:
+      dockerfile_inline: |
+        FROM varnish
+        USER root
+        run set -ex; \
+          apt-get update; \
+          apt-get -y install /pkgs/*.deb $$VMOD_DEPS $$VMOD_BUILD_DEPS $$VMOD_RUN_DEPS; \
+          install-vmod https://github.com/varnish/varnish-otlp-exporter/archive/refs/heads/main.tar.gz; \
+          apt-get -y purge --auto-remove $$VMOD_DEPS varnish-dev $$VMOD_BUILD_DEPS; \
+          rm -rf /var/lib/apt/lists/*
+        ADD --chown=varnish https://raw.githubusercontent.com/varnish/varnish-otlp-exporter/main/otel.vcl /etc/varnish/otel.vcl
+        USER varnish
 
-  origin:
-    image: python
-    command: python -m http.server --directory /orig_data 80
+  origin-files: &origin
+    command: /app/main origin-files
     volumes:
       - ${ORIGIN_DATA}:/orig_data
+    environment: &otel_env
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://loki:3100/otlp/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: https://tempo:4318/v1/traces
+    build:
+      dockerfile_inline: |
+        FROM golang as build
+        WORKDIR /app/
+        COPY src/origin/ .
+        RUN go env -w GOPROXY=direct
+        RUN CGO_ENABLED=0 go build -o main main.go
+
+        FROM alpine:3.20
+        COPY --from=build /app/main  /app/main
+        CMD ["/app/main"]
+
+  origin-esi:
+    <<: *origin
+    command: /app/main origin-files
+
+  exporter:
+    command: varnish-otlp-exporter
+    volumes:
+      - workdir:/var/lib/varnish
+    environment:
+      <<: *otel_env
+      OTEL_SERVICE_NAME: varnish
+
+    depends_on:
+      - varnish
+    build:
+      dockerfile_inline: |
+        FROM golang
+        RUN set -ex; \
+            git clone https://github.com/varnish/varnish-otlp-exporter.git; \
+            cd varnish-otlp-exporter; \
+            go build -o /tmp/varnish-otlp-exporter;
+
+        FROM varnish
+        USER root
+        COPY --from=0 /tmp/varnish-otlp-exporter /usr/bin/varnish-otlp-exporter
+        RUN set -ex; \
+            mkdir /tmp/build; \
+            cd /tmp/build; \
+            apt-get update; \
+            apt-get -y install /pkgs/*.deb cmake docutils jq libcjson1 libcjson-dev git; \
+            git clone https://github.com/varnish/varnishlog-json.git; \
+            cd varnishlog-json; \
+            cmake -B build; \
+            cmake --build build/; \
+            ctest --test-dir build/; \
+            cmake --install build/; \
+            apt-get -y purge --auto-remove varnish-dev cmake docutils jq libcjson-dev git; \
+            rm -rf /var/lib/apt/lists/* /tmp/build
+        USER varnish
 
   grafana:
     image: grafana/grafana-enterprise
     ports:
       - 3000:${GRAFANA_PORT}
+    environment:
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
     volumes:
       - ${GRAFANA_CONF}:/etc/grafana/grafana.ini
       - ${GRAFANA_PROVISIONING}:/etc/grafana/provisioning/
 
-  exporter:
-    image: stat-exporter
-    command: /tmp/prometheus_varnish_exporter -n varnish -verbose
+  tempo:
+    image: grafana/tempo:latest
+    command: "-config.file=/etc/tempo.yaml"
     volumes:
-      - workdir:/var/lib/varnish
-    depends_on:
-      - varnish
-    build:
-      dockerfile_inline: |
-        FROM curlimages/curl
-        RUN set -ex; \
-            cd /tmp/; \
-            curl -L https://github.com/jonnenauha/prometheus_varnish_exporter/releases/download/1.6.1/prometheus_varnish_exporter-1.6.1.linux-amd64.tar.gz | tar xvzf - --strip 1
-        FROM varnish
-        COPY --from=0 /tmp/prometheus_varnish_exporter /tmp/prometheus_varnish_exporter
+      - ./conf/tempo.yaml:/etc/tempo.yaml
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.53.0
     volumes:
       - ${PROMETHEUS_CONF}:/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --enable-feature=otlp-write-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
 
   loki:
-    image: grafana/loki:2.9.0
+    image: grafana/loki:3.1.0
     command: -config.file=/etc/loki/local-config.yaml
-
-  promtail:
-    image: ncsa-promtail
-    entrypoint: ""
-    command: bash -c "varnishncsa -t off -n varnish | /tmp/promtail -config.file=/etc/promtail/config.yml --stdin"
-    volumes:
-      - ./conf/promtail-config.yaml:/etc/promtail/config.yml
-      - workdir:/var/lib/varnish
-    build:
-      dockerfile_inline: |
-        FROM curlimages/curl
-        RUN set -ex; \
-            curl -sL https://github.com/grafana/loki/releases/download/v2.8.7/promtail-linux-amd64.zip | unzip -d /tmp -
-
-        FROM varnish
-        COPY --from=0 --chmod=555 /tmp/promtail-linux-amd64 /tmp/promtail
 
 volumes:
   workdir:

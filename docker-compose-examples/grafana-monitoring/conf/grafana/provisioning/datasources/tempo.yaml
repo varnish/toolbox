@@ -1,0 +1,30 @@
+apiVersion: 1
+
+datasources:
+- name: Tempo
+  type: tempo
+  access: proxy
+  url: http://tempo:3200
+  uid: tempoUID
+  jsonData:
+    httpMethod: GET
+    tracesToLogsV2:
+      datasourceUid: lokiUID
+      filterBySpanID: true
+      filterByTraceID: true
+      spanEndTimeShift: 1m
+      spanStartTimeShift: -1m
+    nodeGraph:
+      enabled: true
+    search:
+      filters:
+        - id: service-name
+          operator: '='
+          scope: resource
+          tag: service.name
+        - id: span-name
+          operator: '='
+          scope: span
+          tag: name
+    serviceMap:
+      datasourceUid: prometheusUID

@@ -21,12 +21,13 @@ random_content() {
 		i=$(( $RANDOM % ( $(( $(date +%s) % 100 )) + 1 ) ))
 		# independently, give ourselves a 1%  chance of uncacheability
 		# (check conf/default.vcl for more context)
-		if [ $(( $RANDOM % 100 )) -lt 1 ]; then
-			u=uncacheable
+		die=$(( $RANDOM % 10 ))
+		if [ $die -lt 1 ]; then
+			u=/esi_top
 		else
-			u=cacheable
+			u=/?cacheable-$i
 		fi
-		send_request /?$u-$i
+		send_request $u
 		sleep 0.01
 	done
 }
