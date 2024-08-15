@@ -1,0 +1,36 @@
+varnishtest "invalid nor URLs"
+
+server s1 {
+	rxreq
+	expect req.url == "/with/a/few/levels/ghi"
+	txresp -hdr "CMSD-Static: nor=http://example.com/some/url"
+
+	rxreq
+	expect req.url == "/with/a/few/levels/but/ending/with/a/slash/"
+	txresp -hdr "CMSD-Static: nor=http://example.com/some/url/but/in/https"
+} -start
+
+varnish v1 -vcl+backend {
+	include "${testdir}/cmsd.vcl";
+
+	sub vcl_recv {
+		if (req.url == "/with/a/few/levels/ghi" ||
+		    req.url == "/with/a/few/levels/but/ending/with/a/slash/") {
+			set req.backend_hint = s1;
+		} else {
+			return (synth(200));
+		}
+	}
+} -start
+
+client c1 {
+	txreq -url "/with/a/few/levels/ghi"
+	rxresp
+
+	txreq -url "/with/a/few/levels/but/ending/with/a/slash/"
+	rxresp
+} -run
+
+# give some times to stats to settle
+delay 0.5
+varnish v1 -expect VMOD_HTTP.handle_requests == 0
