@@ -29,53 +29,53 @@ sub cmsd_prefetch {
 	}
 
 	headerplus.init(beresp);
-	set beresp.http.X-Prefetch-URLs = headerplus.attr_get("CMSD-Static", "nor");
+	set bereq.http.X-Prefetch-URLs = headerplus.attr_get("CMSD-Static", "nor");
 
 # nor #1
 	# do the nor elements look like a relative path? If not, bail
-	if (!str.split(beresp.http.X-Prefetch-URLs, 1, "|") ||
-	    str.split(beresp.http.X-Prefetch-URLs, 1, "|") == "" ||
-	    str.split(beresp.http.X-Prefetch-URLs, 1, "|") ~ "^https?://") {
+	if (!str.split(bereq.http.X-Prefetch-URLs, 1, "|") ||
+	    str.split(bereq.http.X-Prefetch-URLs, 1, "|") == "" ||
+	    str.split(bereq.http.X-Prefetch-URLs, 1, "|") ~ "^https?://") {
 		return;
 	}
 	http.init(0);
 	http.req_set_max_loops(0, 3);
-	if (str.split(beresp.http.X-Prefetch-URLs, 1, "|") ~ "^/") {
-		http.req_set_url(0, bereq.http.X-Prefetch-No-Path-URL + str.split(beresp.http.X-Prefetch-URLs, 1, "|"));
+	if (str.split(bereq.http.X-Prefetch-URLs, 1, "|") ~ "^/") {
+		http.req_set_url(0, bereq.http.X-Prefetch-No-Path-URL + str.split(bereq.http.X-Prefetch-URLs, 1, "|"));
 	} else {
-		http.req_set_url(0, bereq.http.X-Prefetch-Dirname-URL + str.split(beresp.http.X-Prefetch-URLs, 1, "|"));
+		http.req_set_url(0, bereq.http.X-Prefetch-Dirname-URL + str.split(bereq.http.X-Prefetch-URLs, 1, "|"));
 	}
 	http.req_set_header(0, "host", bereq.http.X-Prefetch-Host);
 	http.req_send_and_finish(0);
 
 # nor #2
-	if (!str.split(beresp.http.X-Prefetch-URLs, 2, "|") ||
-	    str.split(beresp.http.X-Prefetch-URLs, 2, "|") == "" ||
-	    str.split(beresp.http.X-Prefetch-URLs, 2, "|") ~ "^https?://") {
+	if (!str.split(bereq.http.X-Prefetch-URLs, 2, "|") ||
+	    str.split(bereq.http.X-Prefetch-URLs, 2, "|") == "" ||
+	    str.split(bereq.http.X-Prefetch-URLs, 2, "|") ~ "^https?://") {
 		return;
 	}
 	http.init(0);
 	http.req_set_max_loops(0, 3);
-	if (str.split(beresp.http.X-Prefetch-URLs, 2, "|") ~ "^/") {
-		http.req_set_url(0, bereq.http.X-Prefetch-No-Path-URL + str.split(beresp.http.X-Prefetch-URLs, 2, "|"));
+	if (str.split(bereq.http.X-Prefetch-URLs, 2, "|") ~ "^/") {
+		http.req_set_url(0, bereq.http.X-Prefetch-No-Path-URL + str.split(bereq.http.X-Prefetch-URLs, 2, "|"));
 	} else {
-		http.req_set_url(0, bereq.http.X-Prefetch-Dirname-URL + str.split(beresp.http.X-Prefetch-URLs, 2, "|"));
+		http.req_set_url(0, bereq.http.X-Prefetch-Dirname-URL + str.split(bereq.http.X-Prefetch-URLs, 2, "|"));
 	}
 	http.req_set_header(0, "host", bereq.http.X-Prefetch-Host);
 	http.req_send_and_finish(0);
 
 # nor #3
-	if (!str.split(beresp.http.X-Prefetch-URLs, 3, "|") ||
-	    str.split(beresp.http.X-Prefetch-URLs, 3, "|") == "" ||
-	    str.split(beresp.http.X-Prefetch-URLs, 3, "|") ~ "^https?://") {
+	if (!str.split(bereq.http.X-Prefetch-URLs, 3, "|") ||
+	    str.split(bereq.http.X-Prefetch-URLs, 3, "|") == "" ||
+	    str.split(bereq.http.X-Prefetch-URLs, 3, "|") ~ "^https?://") {
 		return;
 	}
 	http.init(0);
 	http.req_set_max_loops(0, 3);
-	if (str.split(beresp.http.X-Prefetch-URLs, 3, "|") ~ "^/") {
-		http.req_set_url(0, bereq.http.X-Prefetch-No-Path-URL + str.split(beresp.http.X-Prefetch-URLs, 3, "|"));
+	if (str.split(bereq.http.X-Prefetch-URLs, 3, "|") ~ "^/") {
+		http.req_set_url(0, bereq.http.X-Prefetch-No-Path-URL + str.split(bereq.http.X-Prefetch-URLs, 3, "|"));
 	} else {
-		http.req_set_url(0, bereq.http.X-Prefetch-Dirname-URL + str.split(beresp.http.X-Prefetch-URLs, 3, "|"));
+		http.req_set_url(0, bereq.http.X-Prefetch-Dirname-URL + str.split(bereq.http.X-Prefetch-URLs, 3, "|"));
 	}
 	http.req_set_header(0, "host", bereq.http.X-Prefetch-Host);
 	http.req_send_and_finish(0);
