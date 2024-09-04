@@ -6,6 +6,8 @@ Start the script, answer a few questions and you are good to go.
 Note that you will need your repository token for it to work. Please contact
 sales@varnish-software.com to get yours.
 
+Note that the script is now hosted directly at https://docs.varnish-software.com/scripts/setup.sh.
+
 # How it is built
 
 Not built, it's just a bash script.
@@ -20,7 +22,7 @@ It can also be used in a non-interactive manner, using environment variables.
 For example:
 
 ``` bash
-TOKEN=XXXXXX INSTALL="varnish-plus varnish-plus-ha" easy_install/script.sh
+TOKEN=XXXXXX INSTALL="varnish-plus varnish-plus-ha" https://docs.varnish-software.com/scripts/setup.sh
 ```
 
-Use `easy_install/script.sh help` to see the full list.
+Use `setup.sh help` to see the full list.
