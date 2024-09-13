@@ -20,7 +20,6 @@ server:
   extraVolumeMounts:
     - name: varnish-s3-conf
       mountPath: /etc/varnish/aws/
-      subpath: /etc/varnish/s3.conf
     - name: varnish-s3-vcl
       mountPath: /etc/varnish/default.vcl
       subPath: default.vcl
