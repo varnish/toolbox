@@ -1,0 +1,66 @@
+services:
+  lb:
+    depends_on:
+      - push-origin
+    image: 'quay.io/varnish-software/varnish-plus:latest'
+    volumes:
+      - ./load-balancer.vcl:/etc/varnish/default.vcl
+    ports:
+      - "6081:6081"
+
+  push-origin: &varnish
+    image: 'quay.io/varnish-software/varnish-plus:latest'
+    deploy:
+      replicas: 3
+    volumes:
+      - ./push.vcl:/etc/varnish/default.vcl
+
+  broadcaster:
+    image: 'quay.io/varnish-software/varnish-broadcaster:latest'
+    restart: always
+    environment:
+      VARNISH_BROADCASTER_CFG: /tmp/nodes/nodes.conf
+      VARNISH_BROADCASTER_EXTRA: -confwatch 1s
+    volumes:
+      - node_dir:/tmp/nodes
+    depends_on:
+      - discovery
+
+  discovery:
+    image: 'quay.io/varnish-software/varnish-discovery:latest'
+    environment:
+      VARNISH_DISCOVERY_FLAGS: dns --group push-origin --nodefile /tmp/nodes/nodes.conf --port 6081
+    volumes:
+      - node_dir:/tmp/nodes
+
+  live_video_generator:
+    image: 'linuxserver/ffmpeg:latest'
+    depends_on:
+      - lb
+    command: >
+      -threads 4
+      -f lavfi -i testsrc=s=1920x1080
+      -vf "drawtext=fontfile=monofonto.ttf: fontsize=84: box=1: boxcolor=black: fontcolor=white: x=790: y=890: text='%{gmtime\\:%H\\\\\\:%M\\\\\\:%S}',
+      drawtext=fontfile=monofonto.ttf: fontsize=84: box=1: boxcolor=black: fontcolor=white: x=600: y=45: text=Varnish Test Video"
+      -r 50
+      -sc_threshold 0
+      -vcodec libx264 -preset superfast
+      -f hls
+      -hls_time 2
+      -hls_flags delete_segments
+      -g 100
+      -keyint_min 100
+      -force_key_frames "expr:gte(t,n_forced*2)"
+      -loglevel 31
+      -stats
+      -method POST
+      -http_user_agent secret
+      http://lb:6081/master.m3u8
+
+
+volumes:
+  node_dir:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
