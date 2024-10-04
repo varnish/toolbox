@@ -1,42 +1,29 @@
 # What it is
 This module contains executable statements, function definitions, methods that are used for authentication, accessing and refreshing of tokens, and querying endpoints from the Varnish Controller.
 
-# What you need to run and maintain the module
-- Varnish Controller instance
-- Main python script that will use this module
-# Example YAML file
-```
-# config.yaml
-endpoint: https://api.demo.varnish.cloud:443
-username: your-own-username
-password: your-own-password
-organization: your-own-org
-```
 # Example python script that outputs the apilogs
 ```
-# get_agent_logs.py
 import vcli    # <-- This imports the vcli.py module
 import time
 
 v = vcli.Vcli.from_yaml("config.yaml")
 
-def fetch_apilogs(token):
-    apilogs = v.query_endpoint("/apilogs", {"msg":"*wrong*"})
+max_id = 0
+def fetch_apilogs():
+    global max_id
+    params = None
+    if max_id > 0:
+        params = { "id[gt]": max_id }
+    apilogs = v.query_endpoint("/apilogs", params)
 
     if apilogs:
         for log in apilogs:
-            print(f"{log['id']} {log['createdAt']} message:{log['msg']}")
-    else:
-        print("No apilogs available.")
+            max_id = max(log['id'], max_id)
+            print(f"{log['createdAt']} message:{log['msg']}")
         return None
 
 while True:
-    token = v.refresh_token()
-
-    if token:
-        fetch_apilogs(token)
-    else:
-        print("Failed to authenticate or retrieve token.")
+    fetch_apilogs()
     time.sleep(5)
 ```
 # How it works
