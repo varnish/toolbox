@@ -1,0 +1,19 @@
+groups:
+  - name: LOG
+    interval: 15s
+    rules:
+      - record: status:count:rate15s
+        expr: |
+          sum(rate({service_name="varnish"} | json status="resp.status" | keep status [15s])) by (status)
+        labels:
+          job: varnish
+      - record: handling:count:rate15s
+        expr: |
+          sum(rate({service_name="varnish"} | json handling | keep handling [15s])) by (handling)
+        labels:
+          job: varnish
+      - record: protocol:count:rate15s
+        expr: |
+          sum(rate({service_name="varnish"} | json proto="req.proto" | keep proto [15s])) by (proto)
+        labels:
+          job: varnish
