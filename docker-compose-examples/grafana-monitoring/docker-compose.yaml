@@ -115,16 +115,12 @@ services:
       - '--enable-feature=otlp-write-receiver'
       - '--web.enable-remote-write-receiver'
       - '--enable-feature=native-histograms'
-    ports:
-      - 9090:${PROMETHEUS_PORT}
 
   loki:
     image: grafana/loki:3.1.0
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./conf/loki:/etc/loki
-    ports:
-      - 3100:${LOKI_PORT}
 
 volumes:
   workdir:

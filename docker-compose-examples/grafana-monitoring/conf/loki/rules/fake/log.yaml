@@ -17,3 +17,8 @@ groups:
           sum(rate({service_name="varnish"} | json proto="req.proto" | keep proto [15s])) by (proto)
         labels:
           job: varnish
+      - record: content_type:count:rate15s
+        expr: |
+          sum(rate({service_name="varnish"} | json type="resp.headers[\"content-type\"][0]" | keep type [15s])) by (type)
+        labels:
+          job: varnish
