@@ -107,11 +107,20 @@ services:
     image: prom/prometheus:v2.53.0
     volumes:
       - ${PROMETHEUS_CONF}:/etc/prometheus/prometheus.yml
-    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --enable-feature=otlp-write-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
+    command: 
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus' 
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--enable-feature=otlp-write-receiver'
+      - '--web.enable-remote-write-receiver'
+      - '--enable-feature=native-histograms'
 
   loki:
     image: grafana/loki:3.1.0
     command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./conf/loki:/etc/loki
 
 volumes:
   workdir:
