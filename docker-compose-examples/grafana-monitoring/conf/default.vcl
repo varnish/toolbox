@@ -1,8 +1,9 @@
 vcl 4.1;
 
 import vtc;
+import std;
 
-include "/etc/varnish/otel.vcl";
+include "otel.vcl";
 
 backend esi { .host = "origin-esi"; }
 backend files { .host = "origin-files"; }
@@ -38,7 +39,7 @@ sub vcl_backend_response {
 	set beresp.ttl = 10s;
 }
 
-include "verbose_builtin.vcl";
+#include "verbose_builtin.vcl";
 
 sub vcl_backend_response {
 	set beresp.ttl = 1y;
