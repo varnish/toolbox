@@ -46,20 +46,26 @@ services:
     command: /app/main origin-esi
 
   exporter:
-    command: /usr/bin/otel_project
-    entrypoint: ["/usr/bin/otel_project"]
-    user: root 
+    command: varnish-otlp-exporter
+    entrypoint: []
+    user: root
     volumes:
       - workdir:/var/lib/varnish
+    depends_on:
+      - varnish
     environment:
       <<: *otel_env
       OTEL_SERVICE_NAME: varnish
+      OTEL_VARNISH_WORKDIR: varnish
+      OTEL_LOGS_EXPORTER: http
+      OTEL_METRICS_EXPORTER: http
+      OTEL_TRACES_EXPORTER: http
     build:
       dockerfile_inline: |
         FROM quay.io/varnish-software/varnish-plus:6.0.13r10
         USER root
-        COPY ./otel_project /usr/bin/otel_project
-        RUN chmod +x /usr/bin/otel_project
+        COPY varnish-otlp-exporter_0.0.1-1~focal_amd64.deb /tmp
+        RUN apt install -y /tmp/*.deb
         USER varnish
 
   grafana:
@@ -82,7 +88,7 @@ services:
     image: prom/prometheus:v2.53.0
     volumes:
       - ${PROMETHEUS_CONF}:/etc/prometheus/prometheus.yml
-    command: --config.file=/etc/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --enable-feature=otlp-write-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
+    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --enable-feature=otlp-write-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
 
   loki:
     image: grafana/loki:3.1.0
