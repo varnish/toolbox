@@ -65,7 +65,7 @@ class Vcli:
         else:
             body = {"org": self.organization} if self.organization else None
             try:
-                response = requests.post(self.login_url, data=body, auth=(self.username, self.password))
+                response = requests.post(self.login_url, json=body, auth=(self.username, self.password))
                 response.raise_for_status()
                 r = response.json()
                 self.accessExpire = r.get('accessExpire')
