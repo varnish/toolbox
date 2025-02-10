@@ -60,6 +60,19 @@ sub vcl_backend_fetch {
 	unset bereq.http.X-Preflight;
 }
 
+sub vcl_backend_response {
+	if (bereq.http.X-Preflight == "check") {
+		# Cache (successful) preflight responses for 1 minute
+		set beresp.ttl = 1m;
+		set beresp.grace = 0s;
+		set beresp.keep = 0s;
+		if (beresp.status != 200) {
+			set beresp.uncacheable = true;
+		}
+		return (deliver);
+	}
+}
+
 sub vcl_synth {
 	# The preflight check resulted in a non-200 response
 	if (req.http.X-Preflight == "unknown" && http.resp_is_ready(16)) {
