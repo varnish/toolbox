@@ -42,23 +42,16 @@ sub vcl_hash {
 	# Separate preflight checks on the Authorization header
 	if (req.http.X-Preflight == "check") {
 		hash_data(req.http.X-Authorization);
+		set req.http.Authorization = req.http.X-Authorization;
+		unset req.http.X-Authorization;
 	}
 }
 
 sub vcl_backend_fetch {
-	# Restore the Authorization header.
-	if (bereq.http.X-Authorization) {
-		set bereq.http.Authorization = bereq.http.X-Authorization;
-	}
-
 	# Restore request method (this was changed by Varnish core).
 	if (bereq.http.X-Preflight == "check") {
 		set bereq.method = "HEAD";
 	}
-
-	# Clean up internal headers
-	unset bereq.http.X-Authorization;
-	unset bereq.http.X-Preflight;
 }
 
 sub vcl_backend_response {
