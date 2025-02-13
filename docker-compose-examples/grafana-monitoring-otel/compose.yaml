@@ -1,0 +1,98 @@
+services:
+  load_generator:
+    image: curlimages/curl
+    volumes:
+      - ./src/load_generator.sh:/usr/bin/load_generator
+    command: /usr/bin/load_generator
+    depends_on:
+      - varnish
+
+  varnish:
+    image: quay.io/varnish-software/varnish-plus:6.0.13r11
+    hostname: varnish
+    volumes:
+      - workdir:/var/lib/varnish
+      - ./conf/default.vcl:/etc/varnish/default.vcl
+    environment:
+      - "VARNISH_LISTEN_PORT=80"
+    ports:
+      - "81:80"
+    depends_on:
+      - origin-files
+      - origin-esi
+
+  origin-files: &origin
+    command: /app/main origin-files
+    volumes:
+      - ./data:/orig_data
+    environment: &otel_env
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://loki:3100/otlp/v1/logs
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://tempo:4318/v1/traces
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+    build:
+      dockerfile_inline: |
+        FROM golang
+        WORKDIR /app/
+        COPY src/origin/ .
+        RUN set -ex; \
+            go env -w GOPROXY=direct; \
+            CGO_ENABLED=0 go build -o /app/main main.go
+
+  origin-esi:
+    <<: *origin
+    command: /app/main origin-esi
+
+  exporter:
+    command: varnish-otel
+    entrypoint: []
+    user: root
+    volumes:
+      - workdir:/var/lib/varnish
+    depends_on:
+      - varnish
+    environment:
+      <<: *otel_env
+      OTEL_SERVICE_NAME: varnish
+      OTEL_VARNISH_WORKDIR: varnish
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+    build:
+      dockerfile_inline: |
+        FROM quay.io/varnish-software/varnish-plus:6.0.13r11
+        USER root
+        RUN set -ex; \
+          curl https://docs.varnish-software.com/scripts/setup.sh | TOKEN=${VARNISH_EXPERIMENTAL_TOKEN} INSTALL="varnish-otel" REPO=experimental bash
+        USER varnish
+
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - 3000:3000
+    environment:
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    volumes:
+      - ./conf/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./conf/grafana/provisioning:/etc/grafana/provisioning/
+
+  tempo:
+    image: grafana/tempo:latest
+    command: "-config.file=/etc/tempo.yaml"
+    volumes:
+      - ./conf/tempo.yaml:/etc/tempo.yaml
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./conf/prometheus.yml:/etc/prometheus/prometheus.yml
+      #    command: --config.file=/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --enable-feature=otlp-write-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
+
+  loki:
+    image: grafana/loki:3.1.0
+    command: -config.file=/etc/loki/local-config.yaml
+
+volumes:
+  workdir:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
