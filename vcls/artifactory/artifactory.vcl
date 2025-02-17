@@ -3,6 +3,11 @@ vcl 4.1;
 import http;
 
 sub vcl_recv {
+	# Avoid caching Docker token requests
+	if (req.url ~ "^/(v2/)?token") {
+		return (pass);
+	}
+
 	# Guard internal headers
 	unset req.http.X-Authorization;
 	if (req.http.X-Preflight != "check") {
