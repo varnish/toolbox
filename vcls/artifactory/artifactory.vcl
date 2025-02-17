@@ -42,6 +42,10 @@ sub vcl_hash {
 	# Separate preflight checks on the Authorization header
 	if (req.http.X-Preflight == "check") {
 		hash_data(req.http.X-Authorization);
+	}
+
+	# Restore Authorization header
+	if (req.http.X-Preflight) {
 		set req.http.Authorization = req.http.X-Authorization;
 		unset req.http.X-Authorization;
 	}
