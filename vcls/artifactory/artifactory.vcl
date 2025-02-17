@@ -18,6 +18,8 @@ sub vcl_recv {
 		http.req_unset_header(16, "Range");
 		http.req_set_header(16, "X-Preflight", "check");
 		http.req_set_method(16, "HEAD");
+		http.req_set_iparam(16, "CURLOPT_SSL_VERIFYHOST", 0);
+		http.req_set_iparam(16, "CURLOPT_SSL_VERIFYPEER", 0);
 		http.req_send(16);
 		http.resp_wait(16);
 		if (http.resp_get_status(16) == 200) {
