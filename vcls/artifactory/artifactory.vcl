@@ -14,8 +14,7 @@ sub vcl_recv {
 		unset req.http.X-Preflight;
 	}
 
-	if (req.http.Authorization && !req.http.X-Preflight &&
-	    (req.method == "GET" || req.method == "HEAD")) {
+	if (req.http.Authorization && !req.http.X-Preflight && req.method == "GET") {
 		# Run preflight check
 		http.init(16);
 		http.req_set_url(16, http.varnish_url(req.url));
