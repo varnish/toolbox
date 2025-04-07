@@ -1,6 +1,7 @@
 vcl 4.1;
 
 import http;
+import std;
 
 sub vcl_recv {
 	# Avoid caching Docker token requests
@@ -15,6 +16,9 @@ sub vcl_recv {
 	}
 
 	if (req.http.Authorization && !req.http.X-Preflight && req.method == "GET") {
+		# Work around http.req_copy_headers() overwriting duplicate headers
+		std.collect(req.http.Accept);
+
 		# Run preflight check
 		http.init(16);
 		http.req_set_url(16, http.varnish_url(req.url));
@@ -81,6 +85,9 @@ sub vcl_synth {
 	# The preflight check resulted in a non-200 response
 	if (req.http.X-Preflight == "unknown" && http.resp_is_ready(16)) {
 		http.resp_copy_headers(16);
+		if (http.resp_get_body_len(16) > 0) {
+			synthetic(http.resp_get_body(16));
+		}
 		return (deliver);
 	}
 }
