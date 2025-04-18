@@ -21,8 +21,6 @@ include "cmcd-cmsd.vcl";
 ...
 ```
 
-There is also an example in `default.vcl` in this directory.
-
 Note: this VCL uses Entreprise vmods (http, headerplus and urlplus), therefore you will need Varnish Enterprise to use it.
 
 ### CMCD Varnishncsa format
