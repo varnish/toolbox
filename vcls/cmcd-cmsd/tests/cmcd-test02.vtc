@@ -1,0 +1,40 @@
+varnishtest "Test CMCD version marker using a query parameter"
+
+server s1 {
+	rxreq
+	txresp
+} -start
+
+varnish v1 -arg "-p vcc_err_unref=off" -vcl+backend {
+	include "${pwd}/cmcd.vcl";
+} -start
+
+logexpect l1 -v v1 -g request {
+        expect * * VCL_Log ^cmcd-bl:2$
+        expect * * VCL_Log ^cmcd-dl:5$
+        expect * * VCL_Log ^cmcd-mtp:6$
+        expect * * VCL_Log ^cmcd-nor:nexturl$
+        expect * * VCL_Log ^cmcd-nrr:8-9$
+        expect * * VCL_Log ^cmcd-su:true$
+        expect * * VCL_Log ^cmcd-br:1$
+        expect * * VCL_Log ^cmcd-d:4$
+        expect * * VCL_Log ^cmcd-ot:m$
+        expect * * VCL_Log ^cmcd-tb:13$
+        expect * * VCL_Log ^cmcd-bs:true$
+        expect * * VCL_Log ^cmcd-rtp:12$
+        expect * * VCL_Log ^cmcd-cid:someid$
+        expect * * VCL_Log ^cmcd-pr:11$
+        expect * * VCL_Log ^cmcd-sf:d$
+        expect * * VCL_Log ^cmcd-sid:guid$
+        expect * * VCL_Log ^cmcd-st:v$
+        expect * * VCL_Log ^cmcd-v:1$
+} -start
+
+client c1 {
+	txreq -url "/?CMCD=bl%3D2,dl=5,mtp=6,nor=nexturl,nrr=8-9,su,br=1,d=4,ot=m,tb=13,bs,rtp=12,cid=someid,pr=11,sf=d,sid=guid,st=v,v=1"
+	rxresp
+        expect resp.http.Access-Control-Allow-Headers == CMCD-Request,CMCD-Object,CMCD-Status,CMCD-Session
+        expect resp.http.Access-Control-Allow-Methods == GET
+} -run
+
+logexpect l1 -wait
