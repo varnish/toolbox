@@ -4,11 +4,10 @@
 
 CMCD stands for Common Media Client Data, and CMSD stands for [Common Media Server Data](https://shop.cta.tech/products/web-application-video-ecosystem-common-media-server-data-cta-5006). These are standards developed by the Consumer Technology Association (CTA) to improve video streaming performance and quality. 
 
-The vcl serves two do two things:
-
-- First, regarding CMCD, this VCL will look for the CMCD request headers (CMCD-Request, CMCD-Object, CMCD-Status, CMCD-Session) or the CMCD query parameter. If found, these will be parsed, and the various entries found will be logged using std.log. The next step is to use `varnishncsa` to enrich the transaction logs with information from these CMCD log entries.
-
-- Second, CMSD is an HTTP extension that allows video origins to push metada about content to intermediate server like Varnish. This VCL leverages this extension, more precisely the `nor` attribute of the `CMSD-Static` header to prefetch the objects that will likely be requested next by the user. This feature is implemented in `cmsd-prefetch.vcl`. If the origin doesn't send `cache-control` or `expires` headers, we can rely on CMSD to correctly set expiration dates for each object, depending on whether it's a manifest of a segment, and whether it's a live or VOD stream. This feature is implemented in `cmsd-ttl.vcl`.
+This VCL leverages the two standards to achieve a few things:
+- allow logging of video-specific metadata extracted from the HTTP headers of the client request
+- enhance caching precision with fine-grained TLL information
+- prefetch content that clients may soon needs
 
 ## Usage
 
