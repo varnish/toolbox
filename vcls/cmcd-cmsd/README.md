@@ -40,3 +40,11 @@ varnishncsa -j -q "ReqUrl ~ video" -F "{\"br\": %{VCL_Log:cmcd-br}x, \"bl\": %{V
 ## Tests
 
 The `vtc`'s or Varnish Test Cases can be found under `tests`. The CMCD tests use logexpect, which will hit a timeout if the expects don't see what they are looking for in the log. It is suggested to run varnishtest with a lower timeout to avoid having to wait for the default timeout if a test fails.
+
+A `varnishtest` can be run from command line on a machine with Varnish Enterprise by running for example:
+
+```
+varnishtest cmcd-test01.vtc
+```
+
+Note, `varnishtest` is not limited to just Enterprise, however these `vtc`'s will need to be run on an Enterprise machine as they include Enterprise only features.
