@@ -23,7 +23,7 @@ include "cmcd-cmsd.vcl";
 
 Note: this VCL uses Entreprise vmods (http, headerplus and urlplus), therefore you will need Varnish Enterprise to use it.
 
-### CMCD Varnishncsa format
+### Logging
 
 #### Plain text
 
