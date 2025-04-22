@@ -21,7 +21,16 @@ include "cmcd-cmsd.vcl";
 ...
 ```
 
-Note: this VCL uses Entreprise vmods (http, headerplus and urlplus), therefore you will need Varnish Enterprise to use it.
+If you use or plan to use the `cmcd` headers further in in the vcl on your own, you should remove lines lines 131-133 in `cmcd.vcl` towards the bottom of `sub cmcd_query_parameter`. There we have:
+
+```
+		# Strip CMCD meta data from the request here. This to avoid cache key explosion.
+		urlplus.query_delete("CMCD");
+		urlplus.write();
+```
+This removes the `cmcd` headers and will stop the custome `cmcd` logic you want to implement.
+
+Note: this VCL uses Entreprise vmods (`http`, `headerplus`, and `urlplus`), therefore you will need Varnish Enterprise to use it.
 
 ### Logging
 
@@ -39,7 +48,7 @@ varnishncsa -j -q "ReqUrl ~ video" -F "{\"br\": %{VCL_Log:cmcd-br}x, \"bl\": %{V
 
 ## Tests
 
-The `vtc`'s or Varnish Test Cases can be found under `tests`. The CMCD tests use logexpect, which will hit a timeout if the expects don't see what they are looking for in the log. It is suggested to run varnishtest with a lower timeout to avoid having to wait for the default timeout if a test fails.
+The `vtc`'s or Varnish Test Cases can be found under `tests`. 
 
 A `varnishtest` can be run from command line on a machine with Varnish Enterprise by running for example:
 
