@@ -2,7 +2,7 @@
 
 ## Purpose
 
-CMCD stands for Common Media Client Data, and CMSD stands for [Common Media Server Data](https://shop.cta.tech/products/web-application-video-ecosystem-common-media-server-data-cta-5006). These are standards developed by the Consumer Technology Association (CTA) to improve video streaming performance and quality. 
+CMCD stands for [Common Media Client Data](https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf), and CMSD stands for [Common Media Server Data](https://shop.cta.tech/products/web-application-video-ecosystem-common-media-server-data-cta-5006). These are standards developed by the Consumer Technology Association (CTA) to improve video streaming performance and quality. 
 
 This VCL leverages the two standards to achieve a few things:
 - allow logging of video-specific metadata extracted from the HTTP headers of the client request
