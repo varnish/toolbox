@@ -46,86 +46,86 @@ sub cmcd_query_parameter {
 		headerplus.init_req();
 		if (headerplus.attr_exists("varnish-cmcd-query", "bl")) {
 			# Integer
-			std.log("cmcd-bl:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "bl"), 0));
+			std.log("cmcd.bl:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "bl"), 0));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "dl")) {
 			# Integer
-			std.log("cmcd-dl:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "dl"), 0));
+			std.log("cmcd.dl:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "dl"), 0));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "mtp")) {
 			# Integer
-			std.log("cmcd-mtp:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "mtp"), 0));
+			std.log("cmcd.mtp:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "mtp"), 0));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "nor")) {
 			# String
 			# Any value of type String MUST be enclosed by opening and closing double quotes
-			std.log("cmcd-nor:" + headerplus.attr_get("varnish-cmcd-query", "nor"));
+			std.log("cmcd.nor:" + headerplus.attr_get("varnish-cmcd-query", "nor"));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "nrr")) {
 			# String of the form "<range-start>-<range-end>"
 			if (headerplus.attr_get("varnish-cmcd-query", "nrr") ~ "^[0-9]*-[0-9]*$") {
-				std.log("cmcd-nrr:" + headerplus.attr_get("varnish-cmcd-query", "nrr"));
+				std.log("cmcd.nrr:" + headerplus.attr_get("varnish-cmcd-query", "nrr"));
 			}
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "su")) {
 			# Boolean
-			std.log("cmcd-su:true");
+			std.log("cmcd.su:true");
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "br")) {
 			# Integer
-			std.log("cmcd-br:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "br"), 0));
+			std.log("cmcd.br:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "br"), 0));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "d")) {
 			# Integer
-			std.log("cmcd-d:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "d"), 0));
+			std.log("cmcd.d:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "d"), 0));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "ot")) {
 			# Token - one of [m,a,v,av,i,c,tt,k,o]
 			if (headerplus.attr_get("varnish-cmcd-query", "ot") ~ "^(m|a|v|av|i|c|tt|k|o)$") {
-				std.log("cmcd-ot:" + headerplus.attr_get("varnish-cmcd-query", "ot"));
+				std.log("cmcd.ot:" + headerplus.attr_get("varnish-cmcd-query", "ot"));
 			}
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "tb")) {
 			# Integer
-			std.log("cmcd-tb:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "tb"), 0));
+			std.log("cmcd.tb:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "tb"), 0));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "bs")) {
 			# Boolean
-			std.log("cmcd-bs:true");
+			std.log("cmcd.bs:true");
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "rtp")) {
 			# Integer
-			std.log("cmcd-rtp:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "rtp"), 0));
+			std.log("cmcd.rtp:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "rtp"), 0));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "cid")) {
 			# String
 			if (str.len(headerplus.attr_get("varnish-cmcd-query", "cid")) <= 64) {
-				std.log("cmcd-cid:" + headerplus.attr_get("varnish-cmcd-query", "cid"));
+				std.log("cmcd.cid:" + headerplus.attr_get("varnish-cmcd-query", "cid"));
 			}
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "pr")) {
 			# Decimal
-			std.log("cmcd-pr:" + headerplus.attr_get("varnish-cmcd-query", "pr"));
+			std.log("cmcd.pr:" + headerplus.attr_get("varnish-cmcd-query", "pr"));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "sf")) {
 			# Token - one of [d,h,s,o]
 			if (headerplus.attr_get("varnish-cmcd-query", "sf") ~ "^(d|h|s|o)$") {
-				std.log("cmcd-sf:" + headerplus.attr_get("varnish-cmcd-query", "sf"));
+				std.log("cmcd.sf:" + headerplus.attr_get("varnish-cmcd-query", "sf"));
 			}
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "sid")) {
 			# String
-			std.log("cmcd-sid:" + headerplus.attr_get("varnish-cmcd-query", "sid"));
+			std.log("cmcd.sid:" + headerplus.attr_get("varnish-cmcd-query", "sid"));
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "st")) {
 			# Token - one of [v,l]
 			if (headerplus.attr_get("varnish-cmcd-query", "st") ~ "^(v|l)$") {
-				std.log("cmcd-st:" + headerplus.attr_get("varnish-cmcd-query", "st"));
+				std.log("cmcd.st:" + headerplus.attr_get("varnish-cmcd-query", "st"));
 			}
 		}
 		if (headerplus.attr_exists("varnish-cmcd-query", "v")) {
 			# Integer
-			std.log("cmcd-v:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "v"), 0));
+			std.log("cmcd.v:" + std.integer(headerplus.attr_get("varnish-cmcd-query", "v"), 0));
 		}
 
 		# Strip CMCD meta data from the request here. This to avoid cache key explosion.
@@ -147,91 +147,91 @@ sub cmcd_headers {
 		if (req.http.CMCD-Request) {
 			if (headerplus.attr_exists("CMCD-Request", "bl")) {
 				# Integer
-				std.log("cmcd-bl:" + std.integer(headerplus.attr_get("CMCD-Request", "bl"), 0));
+				std.log("cmcd.bl:" + std.integer(headerplus.attr_get("CMCD-Request", "bl"), 0));
 			}
 			if (headerplus.attr_exists("CMCD-Request", "dl")) {
 				# Integer
-				std.log("cmcd-dl:" + std.integer(headerplus.attr_get("CMCD-Request", "dl"), 0));
+				std.log("cmcd.dl:" + std.integer(headerplus.attr_get("CMCD-Request", "dl"), 0));
 			}
 			if (headerplus.attr_exists("CMCD-Request", "mtp")) {
 				# Integer
-				std.log("cmcd-mtp:" + std.integer(headerplus.attr_get("CMCD-Request", "mtp"), 0));
+				std.log("cmcd.mtp:" + std.integer(headerplus.attr_get("CMCD-Request", "mtp"), 0));
 			}
 			if (headerplus.attr_exists("CMCD-Request", "nor")) {
 				# String
-				std.log("cmcd-nor:" + headerplus.attr_get("CMCD-Request", "nor"));
+				std.log("cmcd.nor:" + headerplus.attr_get("CMCD-Request", "nor"));
 			}
 			if (headerplus.attr_exists("CMCD-Request", "nrr")) {
 				# String on the form "<range-start>-<range-end>"
 				if (headerplus.attr_get("CMCD-Request", "nrr") ~ "^[0-9]*-[0-9]*$") {
-					std.log("cmcd-nrr:" + headerplus.attr_get("CMCD-Request", "nrr"));
+					std.log("cmcd.nrr:" + headerplus.attr_get("CMCD-Request", "nrr"));
 				}
 			}
 			if (headerplus.attr_exists("CMCD-Request", "su")) {
 				# Boolean
-				std.log("cmcd-su:true");
+				std.log("cmcd.su:true");
 			}
 		}
 		if (req.http.CMCD-Object) {
 			if (headerplus.attr_exists("CMCD-Object", "br")) {
 				# Integer
-				std.log("cmcd-br:" + std.integer(headerplus.attr_get("CMCD-Object", "br"), 0));
+				std.log("cmcd.br:" + std.integer(headerplus.attr_get("CMCD-Object", "br"), 0));
 			}
 			if (headerplus.attr_exists("CMCD-Object", "d")) {
 				# Integer
-				std.log("cmcd-d:" + std.integer(headerplus.attr_get("CMCD-Object", "d"), 0));
+				std.log("cmcd.d:" + std.integer(headerplus.attr_get("CMCD-Object", "d"), 0));
 			}
 			if (headerplus.attr_exists("CMCD-Object", "ot")) {
 				# Token - one of [m,a,v,av,i,c,tt,k,o]
 				if (headerplus.attr_get("CMCD-Object", "ot") ~ "^(m|a|v|av|i|c|tt|k|o)$") {
-					std.log("cmcd-ot:" + headerplus.attr_get("CMCD-Object", "ot"));
+					std.log("cmcd.ot:" + headerplus.attr_get("CMCD-Object", "ot"));
 				}
 			}
 			if (headerplus.attr_exists("CMCD-Object", "tb")) {
 				# Integer
-				std.log("cmcd-tb:" + std.integer(headerplus.attr_get("CMCD-Object", "tb"), 0));
+				std.log("cmcd.tb:" + std.integer(headerplus.attr_get("CMCD-Object", "tb"), 0));
 			}
 		}
 		if (req.http.CMCD-Status) {
 			if (headerplus.attr_exists("CMCD-Status", "bs")) {
 				# Boolean
-				std.log("cmcd-bs:true");
+				std.log("cmcd.bs:true");
 			}
 			if (headerplus.attr_exists("CMCD-Status", "rtp")) {
 				# Integer
-				std.log("cmcd-rtp:" + std.integer(headerplus.attr_get("CMCD-Status", "rtp"), 0));
+				std.log("cmcd.rtp:" + std.integer(headerplus.attr_get("CMCD-Status", "rtp"), 0));
 			}
 		}
 		if (req.http.CMCD-Session) {
 			if (headerplus.attr_exists("CMCD-Session", "cid")) {
 				# String
 				if (str.len(headerplus.attr_get("CMCD-Session", "cid")) <= 64) {
-					std.log("cmcd-cid:" + headerplus.attr_get("CMCD-Session", "cid"));
+					std.log("cmcd.cid:" + headerplus.attr_get("CMCD-Session", "cid"));
 				}
 			}
 			if (headerplus.attr_exists("CMCD-Session", "pr")) {
 				# Decimal
-				std.log("cmcd-pr:" + headerplus.attr_get("CMCD-Session", "pr"));
+				std.log("cmcd.pr:" + headerplus.attr_get("CMCD-Session", "pr"));
 			}
 			if (headerplus.attr_exists("CMCD-Session", "sf")) {
 				# Token - one of [d,h,s,o]
 				if (headerplus.attr_get("CMCD-Session", "sf") ~ "^(d|h|s|o)$") {
-					std.log("cmcd-sf:" + headerplus.attr_get("CMCD-Session", "sf"));
+					std.log("cmcd.sf:" + headerplus.attr_get("CMCD-Session", "sf"));
 				}
 			}
 			if (headerplus.attr_exists("CMCD-Session", "sid")) {
 				# String
-				std.log("cmcd-sid:" + headerplus.attr_get("CMCD-Session", "sid"));
+				std.log("cmcd.sid:" + headerplus.attr_get("CMCD-Session", "sid"));
 			}
 			if (headerplus.attr_exists("CMCD-Session", "st")) {
 				# Token - one of [v,l]
 				if (headerplus.attr_get("CMCD-Session", "st") ~ "^(v|l)$") {
-					std.log("cmcd-st:" + headerplus.attr_get("CMCD-Session", "st"));
+					std.log("cmcd.st:" + headerplus.attr_get("CMCD-Session", "st"));
 				}
 			}
 			if (headerplus.attr_exists("CMCD-Session", "v")) {
 				# Integer
-				std.log("cmcd-v:" + std.integer(headerplus.attr_get("CMCD-Session", "v"), 0));
+				std.log("cmcd.v:" + std.integer(headerplus.attr_get("CMCD-Session", "v"), 0));
 			}
 		}
 	}
