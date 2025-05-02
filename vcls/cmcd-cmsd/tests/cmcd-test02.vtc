@@ -6,28 +6,28 @@ server s1 {
 } -start
 
 varnish v1 -arg "-p vcc_err_unref=off" -vcl+backend {
-	include "${pwd}/cmcd.vcl";
+	include "${pwd}/../cmcd.vcl";
 } -start
 
 logexpect l1 -v v1 -g request {
-        expect * * VCL_Log ^cmcd-bl:2$
-        expect * * VCL_Log ^cmcd-dl:5$
-        expect * * VCL_Log ^cmcd-mtp:6$
-        expect * * VCL_Log ^cmcd-nor:nexturl$
-        expect * * VCL_Log ^cmcd-nrr:8-9$
-        expect * * VCL_Log ^cmcd-su:true$
-        expect * * VCL_Log ^cmcd-br:1$
-        expect * * VCL_Log ^cmcd-d:4$
-        expect * * VCL_Log ^cmcd-ot:m$
-        expect * * VCL_Log ^cmcd-tb:13$
-        expect * * VCL_Log ^cmcd-bs:true$
-        expect * * VCL_Log ^cmcd-rtp:12$
-        expect * * VCL_Log ^cmcd-cid:someid$
-        expect * * VCL_Log ^cmcd-pr:11$
-        expect * * VCL_Log ^cmcd-sf:d$
-        expect * * VCL_Log ^cmcd-sid:guid$
-        expect * * VCL_Log ^cmcd-st:v$
-        expect * * VCL_Log ^cmcd-v:1$
+        expect * * VCL_Log ^cmcd.bl:2$
+        expect * * VCL_Log ^cmcd.dl:5$
+        expect * * VCL_Log ^cmcd.mtp:6$
+        expect * * VCL_Log ^cmcd.nor:nexturl$
+        expect * * VCL_Log ^cmcd.nrr:8-9$
+        expect * * VCL_Log ^cmcd.su:true$
+        expect * * VCL_Log ^cmcd.br:1$
+        expect * * VCL_Log ^cmcd.d:4$
+        expect * * VCL_Log ^cmcd.ot:m$
+        expect * * VCL_Log ^cmcd.tb:13$
+        expect * * VCL_Log ^cmcd.bs:true$
+        expect * * VCL_Log ^cmcd.rtp:12$
+        expect * * VCL_Log ^cmcd.cid:someid$
+        expect * * VCL_Log ^cmcd.pr:11$
+        expect * * VCL_Log ^cmcd.sf:d$
+        expect * * VCL_Log ^cmcd.sid:guid$
+        expect * * VCL_Log ^cmcd.st:v$
+        expect * * VCL_Log ^cmcd.v:1$
 } -start
 
 client c1 {
