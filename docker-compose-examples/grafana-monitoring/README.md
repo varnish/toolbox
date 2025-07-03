@@ -2,6 +2,8 @@ Ever wondered how to setup `varnish` and `grafana` together? If so, have a look 
 
 # Getting started
 
+First, log into docker using your Varnish Enterprise Credentials. More details can be found [here in the documentation](https://docs.varnish-software.com/docker/).
+
 - run "docker compose up -d"
 - go to http://localhost:3000
 - login with admin:password
