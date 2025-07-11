@@ -8,7 +8,7 @@ services:
       - varnish
 
   varnish:
-    image: quay.io/varnish-software/varnish-plus:6.0.13r11
+    image: quay.io/varnish-software/varnish-plus:latest
     hostname: varnish
     volumes:
       - workdir:/var/lib/varnish
@@ -57,7 +57,7 @@ services:
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
     build:
       dockerfile_inline: |
-        FROM quay.io/varnish-software/varnish-plus:6.0.13r11
+        FROM quay.io/varnish-software/varnish-plus:latest
         USER root
         RUN set -ex; \
           curl https://docs.varnish-software.com/scripts/setup.sh | TOKEN=${VARNISH_EXPERIMENTAL_TOKEN} INSTALL="varnish-otel" REPO=experimental bash
