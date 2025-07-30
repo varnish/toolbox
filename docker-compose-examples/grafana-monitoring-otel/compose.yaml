@@ -6,20 +6,25 @@ services:
     command: /usr/bin/load_generator
     depends_on:
       - varnish
-
-  varnish:
-    image: quay.io/varnish-software/varnish-plus:latest
     hostname: varnish
     volumes:
       - workdir:/var/lib/varnish
+      - ./conf/varnish-enterprise.lic:/etc/varnish/varnish-enterprise.lic
       - ./conf/default.vcl:/etc/varnish/default.vcl
-    environment:
-      - "VARNISH_LISTEN_PORT=80"
+    command: varnishd -F -a :80 -f /etc/varnish/default.vcl -n varnish
     ports:
-      - "81:80"
+      - "8080:80"
     depends_on:
       - origin-files
       - origin-esi
+    build:
+      dockerfile_inline: |
+        FROM debian:bookworm-slim
+        RUN set -ex; \
+          apt-get update; \
+          apt-get install -y curl; \
+          curl -s https://packagecloud.io/install/repositories/varnishplus/60-enterprise/script.deb.sh | bash; \
+          apt-get install -y varnish-plus
 
   origin-files: &origin
     command: /app/main origin-files
@@ -57,11 +62,13 @@ services:
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
     build:
       dockerfile_inline: |
-        FROM quay.io/varnish-software/varnish-plus:latest
-        USER root
+        FROM debian:bookworm-slim
         RUN set -ex; \
-          curl https://docs.varnish-software.com/scripts/setup.sh | TOKEN=${VARNISH_EXPERIMENTAL_TOKEN} INSTALL="varnish-otel" REPO=experimental bash
-        USER varnish
+          apt-get update; \
+          apt-get install -y curl; \
+          curl -s https://packagecloud.io/install/repositories/varnishplus/60-enterprise/script.deb.sh | bash; \
+          apt-get install -y varnish-plus
+        COPY ./varnish-otel /usr/bin/varnish-otel
 
   grafana:
     image: grafana/grafana-enterprise
@@ -83,7 +90,6 @@ services:
     image: prom/prometheus:v2.53.0
     volumes:
       - ./conf/prometheus.yml:/etc/prometheus/prometheus.yml
-      #    command: --config.file=/etc/prometheus/prometheus.yml
     command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --enable-feature=otlp-write-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
 
   loki:

@@ -3,9 +3,7 @@ Using `opentelemetry` simplifies the process quite a bit and notably introduces 
 
 # Getting started
 
-First, login to docker using your Varnish Enterprise Credentials. More details can be found [here in the documentation](https://docs.varnish-software.com/docker/).
-
-- set `VARNISH_EXPERIMENTAL_TOKEN` in `.env` with your Varnish Enterprise Experimental repository token
+- place the license file ( `varnish-enterprise.lic`, you can ask for one [here](https://www.varnish-software.com/contact-us/))
 - run "docker compose up -d"
 - go to http://localhost:3000
 - login with `admin:password`
