@@ -6,6 +6,8 @@ services:
     command: /usr/bin/load_generator
     depends_on:
       - varnish
+
+  varnish:
     hostname: varnish
     volumes:
       - workdir:/var/lib/varnish
