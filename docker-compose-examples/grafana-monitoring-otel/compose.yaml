@@ -69,7 +69,7 @@ services:
           apt-get update; \
           apt-get install -y curl; \
           curl -s https://packagecloud.io/install/repositories/varnishplus/60-enterprise/script.deb.sh | bash; \
-          apt-get install -y varnish-plus
+          apt-get install -y varnish-otel
 
   grafana:
     image: grafana/grafana-enterprise
