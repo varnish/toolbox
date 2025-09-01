@@ -9,6 +9,7 @@ services:
 
   varnish:
     hostname: varnish
+    #platform: linux/amd64 # Uncomment this line when running on Apple M1
     volumes:
       - workdir:/var/lib/varnish
       - ./conf/varnish-enterprise.lic:/etc/varnish/varnish-enterprise.lic
@@ -52,6 +53,7 @@ services:
   exporter:
     command: varnish-otel
     entrypoint: []
+    #platform: linux/amd64 # Uncomment this line when running on Apple M1
     user: root
     volumes:
       - workdir:/var/lib/varnish
