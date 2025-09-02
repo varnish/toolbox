@@ -215,16 +215,14 @@ func main() {
 		}
 	}
 
-	if all_good {
-		fmt.Println("all clear")
-		os.Exit(0)
+	if !all_good {
+		report, err := yaml.Marshal(edgeReport)
+		if err != nil {
+			log.Fatalf("Edge report marshaling error: %v", err)
+		}
+
+		log.Fatalf("%s\n", string(report))
 	}
 
-	report, err := yaml.Marshal(edgeReport)
-	if err != nil {
-		log.Fatalf("Edge report marshaling error: %v", err)
-	}
-
-	fmt.Printf("%s\n", string(report))
-	os.Exit(1)
+	fmt.Println("all clear")
 }
