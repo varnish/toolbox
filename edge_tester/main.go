@@ -63,7 +63,7 @@ func getUrls(path string) []Url {
 	for i := range urls {
 		parsedURL, err := url.Parse(urls[i].Uri)
 		if err != nil {
-			panic(err)
+			log.Fatalf("URL parse error: %v", err)
 		}
 		urls[i].Host = parsedURL.Host
 	}
@@ -108,7 +108,7 @@ func testEdgeDNS(edgeString string) (Edge, ErrorReport) {
 func testUrlWithIp(url Url, ip net.IP) ErrorReport {
 	ipString := ip.String()
 	if ip.To4() == nil {
-		ipString = "[" + ipString + "]"
+		ipString = fmt.Sprintf("[%s]", ipString)
 	}
 	reproducer := fmt.Sprintf(`curl -o /dev/null -qsv "%s" --connect-to "%s:443:%s:443"`, url.Uri, url.Host, ipString)
 
@@ -118,7 +118,7 @@ func testUrlWithIp(url Url, ip net.IP) ErrorReport {
 	}}
 	client := &http.Client{Transport: tr}
 
-	req, err := http.NewRequest("GET", url.Uri, nil)
+	req, err := http.NewRequest(http.MethodGet, url.Uri, nil)
 	if err != nil {
 		return ErrorReport{
 			Reproducer: reproducer,
@@ -189,6 +189,9 @@ func testEdge(edgeString string, urls []Url) Edge {
 }
 
 func main() {
+	if len(os.Args) < 3 {
+		log.Fatal("Not enough arguments, will now exit")
+	}
 	edges := getEdges(os.Args[1])
 	urls := getUrls(os.Args[2])
 
@@ -208,19 +211,20 @@ func main() {
 	for _, er := range edgeReport {
 		if len(er.Errors) > 0 {
 			all_good = false
+			break
 		}
 	}
-	if all_good {
-		fmt.Printf("all clear\n")
-		os.Exit(0)
-	} else {
-		report, err := yaml.Marshal(edgeReport)
-		if err != nil {
-			panic(err)
-		} else {
-			fmt.Printf("%s\n", string(report))
-		}
 
-		os.Exit(1)
+	if all_good {
+		fmt.Println("all clear")
+		os.Exit(0)
 	}
+
+	report, err := yaml.Marshal(edgeReport)
+	if err != nil {
+		log.Fatalf("Edge report marshaling error: %v", err)
+	}
+
+	fmt.Printf("%s\n", string(report))
+	os.Exit(1)
 }
