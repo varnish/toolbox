@@ -1,16 +1,20 @@
-variable REGION {
-  type = string
+variable "region" {
+  type    = string
   default = "us-west-2"
 }
 
-variable VE6_INSTANCE {
-  type = string
-  default = "t2.micro"
+variable "ve6_instance" {
+  type    = string
+  default = "t3.micro"
 }
 
-# Add your key in Key pairs in AWS and change the name under
-variable KEY_NAME {
-  type = string
-  default = "your_key_pair_name"
+variable "key_name" {
+  type        = string
+  description = "Add your key in Key pairs in AWS"
 }
 
+variable "ami_owners" {
+  type        = list(string)
+  default     = ["679593333241"]
+  description = "Varnish Software marketplace image"
+}
