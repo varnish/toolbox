@@ -1,4 +1,4 @@
-data "aws_ami" "ubuntu-ve6" {
+data "aws_ami" "ubuntu_ve6" {
   most_recent = true
 
   filter {
@@ -14,8 +14,8 @@ data "aws_ami" "ubuntu-ve6" {
   owners = var.ami_owners
 }
 
-resource "aws_instance" "tf-ve6" {
-  ami                    = data.aws_ami.ubuntu-ve6.id
+resource "aws_instance" "tf_ve6" {
+  ami                    = data.aws_ami.ubuntu_ve6.id
   instance_type          = var.ve6_instance
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.s3shield_sec_22_80_443.id]
