@@ -1,3 +1,4 @@
 # Ignore deb files
 *.deb
 .env
+.DS_Store
