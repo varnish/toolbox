@@ -119,6 +119,7 @@ if [ -e Cargo.toml ]; then
 	VMODDIR="$(pkg-config  --variable=vmoddir varnishapi)"
 	cp target/release/lib$PKG.so "$VMODDIR"
 else
+	make -j"$(nproc)" VERBOSE=1
 	make -j"$(nproc)" VERBOSE=1 install
 fi
 
