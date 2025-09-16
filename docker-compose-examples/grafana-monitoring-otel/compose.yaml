@@ -14,7 +14,7 @@ services:
       - workdir:/var/lib/varnish
       - ./conf/varnish-enterprise.lic:/etc/varnish/varnish-enterprise.lic
       - ./conf/default.vcl:/etc/varnish/default.vcl
-    command: varnishd -F -a :80 -f /etc/varnish/default.vcl -n varnish
+    command: varnishd -F -a :80 -f /etc/varnish/default.vcl -n varnish -p esi_limit=1
     ports:
       - "8080:80"
     depends_on:
