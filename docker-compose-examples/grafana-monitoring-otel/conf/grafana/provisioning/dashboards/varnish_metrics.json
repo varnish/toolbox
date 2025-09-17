@@ -18,18 +18,12 @@
   "description": "A dashboard to use to debug a running varnish instance. Easily track requests, cache hits, network i/o, sessions, threads, bans, ban lurker and the ban list size",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "gnetId": 9903,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
-      "datasource": {
-        "type": "loki",
-        "uid": "lokiUID"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -39,16 +33,7 @@
       "id": 25,
       "panels": [],
       "repeat": "cluster",
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "lokiUID"
-          },
-          "refId": "A"
-        }
-      ],
-      "title": "Row title",
+      "title": "Overview",
       "type": "row"
     },
     {
@@ -78,7 +63,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -103,6 +88,7 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -114,19 +100,21 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum(irate(varnish_main_client_req{instance=~\"^($varnish_instance).*\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(irate(varnish_main_client_requests{instance=~\"^($varnish_instance).*\"}[5m]))",
           "format": "time_series",
           "interval": "15s",
           "intervalFactor": 1,
           "legendFormat": "",
           "metric": "",
+          "range": true,
           "refId": "A",
           "step": 15
         }
@@ -162,7 +150,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -187,6 +175,7 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -198,7 +187,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -245,7 +234,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -270,6 +259,7 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "mean"
@@ -281,7 +271,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -327,7 +317,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -352,6 +342,7 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -363,7 +354,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -416,7 +407,7 @@
             "steps": [
               {
                 "color": "rgba(245, 54, 54, 0.9)",
-                "value": null
+                "value": 0
               },
               {
                 "color": "rgba(237, 129, 40, 0.89)",
@@ -438,7 +429,6 @@
         "x": 14,
         "y": 1
       },
-      "hideTimeOverride": false,
       "id": 6,
       "maxDataPoints": 100,
       "options": {
@@ -456,7 +446,7 @@
         "showThresholdMarkers": false,
         "sizing": "auto"
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -464,8 +454,8 @@
             "uid": "prometheusUID"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "avg(rate(varnish_main_cache_hit[5m])) / rate(varnish_main_client_req[5m])",
+          "editorMode": "code",
+          "expr": "avg(rate(varnish_main_cache_hits[5m]) / (rate(varnish_main_client_requests[5m])))",
           "format": "time_series",
           "fullMetaSearch": false,
           "hide": false,
@@ -478,6 +468,17 @@
           "refId": "A",
           "step": 600,
           "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "expr": "",
+          "hide": false,
+          "instant": false,
+          "range": true,
+          "refId": "B"
         }
       ],
       "title": "Cache Hit Rate",
@@ -486,10 +487,6 @@
     },
     {
       "collapsed": false,
-      "datasource": {
-        "type": "loki",
-        "uid": "lokiUID"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -498,16 +495,7 @@
       },
       "id": 26,
       "panels": [],
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "lokiUID"
-          },
-          "refId": "A"
-        }
-      ],
-      "title": "Row title",
+      "title": "Saturation",
       "type": "row"
     },
     {
@@ -527,6 +515,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 40,
             "gradientMode": "none",
@@ -559,7 +548,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -642,11 +631,12 @@
           "width": 400
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -721,6 +711,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 60,
             "gradientMode": "none",
@@ -754,7 +745,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -831,23 +822,26 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "avg(rate(varnish_main_cache_hit{instance=~\"^($varnish_instance).*\"}[5m]) / rate(varnish_main_client_req{instance=~\"^($varnish_instance).*\"}[5m]))",
+          "editorMode": "code",
+          "expr": "avg(rate(varnish_main_cache_hits{instance=~\"^($varnish_instance).*\"}[5m]) / rate(varnish_main_client_requests{instance=~\"^($varnish_instance).*\"}[5m]))",
           "format": "time_series",
           "hide": false,
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "cache hit %",
+          "range": true,
           "refId": "A",
           "step": 60
         },
@@ -856,12 +850,14 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "avg(1 - (rate(varnish_main_cache_hit{instance=~\"^($varnish_instance).*\"}[5m]) / rate(varnish_main_client_req{instance=~\"^($varnish_instance).*\"}[5m])))",
+          "editorMode": "code",
+          "expr": "avg(1 - (rate(varnish_main_cache_hits{instance=~\"^($varnish_instance).*\"}[5m]) / rate(varnish_main_client_requests{instance=~\"^($varnish_instance).*\"}[5m])))",
           "format": "time_series",
           "hide": false,
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "cache miss %",
+          "range": true,
           "refId": "B",
           "step": 60
         },
@@ -870,12 +866,14 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "avg(1 - (rate(varnish_main_cache_hitpass{instance=~\"^($varnish_instance).*\"}[5m]) / rate(varnish_main_client_req{instance=~\"^($varnish_instance).*\"}[5m])))",
+          "editorMode": "code",
+          "expr": "avg(1 - (rate(varnish_main_cache_hitpasses{instance=~\"^($varnish_instance).*\"}[5m]) / rate(varnish_main_client_requests{instance=~\"^($varnish_instance).*\"}[5m])))",
           "format": "time_series",
           "hide": false,
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "cache hit pass %",
+          "range": true,
           "refId": "C",
           "step": 60
         }
@@ -883,32 +881,6 @@
       "title": "Cache hits",
       "transparent": true,
       "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "datasource": {
-        "type": "loki",
-        "uid": "lokiUID"
-      },
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 22
-      },
-      "id": 27,
-      "panels": [],
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "lokiUID"
-          },
-          "refId": "A"
-        }
-      ],
-      "title": "Row title",
-      "type": "row"
     },
     {
       "datasource": {
@@ -927,6 +899,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 50,
             "gradientMode": "none",
@@ -959,7 +932,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1076,9 +1049,8 @@
         "h": 14,
         "w": 12,
         "x": 0,
-        "y": 23
+        "y": 22
       },
-      "hideTimeOverride": false,
       "id": 12,
       "options": {
         "legend": {
@@ -1093,23 +1065,26 @@
           "width": 400
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum(irate(varnish_main_s_resp_hdrbytes{instance=~\"^($varnish_instance).*\"}[5m]) + irate(varnish_main_s_resp_bodybytes{instance=~\"^($varnish_instance).*\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(irate(varnish_main_response_hdrbytes{instance=~\"^($varnish_instance).*\"}[5m]) + irate(varnish_main_response_bodybytes{instance=~\"^($varnish_instance).*\"}[5m]))",
           "format": "time_series",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "frontend",
+          "range": true,
           "refId": "A",
           "step": 30
         },
@@ -1118,13 +1093,15 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum(irate(varnish_backend_beresp_hdrbytes{instance=~\"^($varnish_instance).*\"}[5m]) + irate(varnish_backend_beresp_bodybytes{instance=~\"^($varnish_instance).*\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(irate(varnish_backend_response_hdrbytes{instance=~\"^($varnish_instance).*\"}[5m]) + irate(varnish_backend_response_bodybytes{instance=~\"^($varnish_instance).*\"}[5m]))",
           "format": "time_series",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "backend",
           "metric": "",
+          "range": true,
           "refId": "B",
           "step": 30
         },
@@ -1133,10 +1110,12 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum(irate(varnish_backend_beresp_hdrbytes{instance=~\"^($varnish_instance).*\"}[5m]) + irate(varnish_backend_beresp_bodybytes{instance=~\"^($varnish_instance).*\"}[5m])) by (backend)",
+          "editorMode": "code",
+          "expr": "sum(irate(varnish_backend_response_hdrbytes{instance=~\"^($varnish_instance).*\"}[5m]) + irate(varnish_backend_response_bodybytes{instance=~\"^($varnish_instance).*\"}[5m])) by (backend)",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "backend {{ backend }}",
+          "range": true,
           "refId": "C",
           "step": 60
         }
@@ -1162,6 +1141,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 40,
             "gradientMode": "none",
@@ -1194,7 +1174,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1279,9 +1259,8 @@
         "h": 14,
         "w": 12,
         "x": 12,
-        "y": 23
+        "y": 22
       },
-      "hideTimeOverride": false,
       "id": 13,
       "options": {
         "legend": {
@@ -1296,23 +1275,26 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum(irate(varnish_main_n_expired{instance=~\"^($varnish_instance).*\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(irate(varnish_main_expired{instance=~\"^($varnish_instance).*\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "expired",
           "metric": "varnish_main_n_object",
+          "range": true,
           "refId": "A",
           "step": 60
         },
@@ -1321,11 +1303,13 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum(irate(varnish_main_n_lru_moved{instance=~\"^($varnish_instance).*\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(irate(varnish_main_lru_moved{instance=~\"^($varnish_instance).*\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "LRU moved",
+          "range": true,
           "refId": "C",
           "step": 60
         },
@@ -1334,11 +1318,13 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum(irate(varnish_main_n_lru_nuked{instance=~\"^($varnish_instance).*\"}[5m]))",
+          "editorMode": "code",
+          "expr": "sum(irate(varnish_main_lru_nuked{instance=~\"^($varnish_instance).*\"}[5m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "LRU nuked",
+          "range": true,
           "refId": "B",
           "step": 60
         },
@@ -1362,28 +1348,15 @@
     },
     {
       "collapsed": false,
-      "datasource": {
-        "type": "loki",
-        "uid": "lokiUID"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 36
       },
       "id": 28,
       "panels": [],
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "lokiUID"
-          },
-          "refId": "A"
-        }
-      ],
-      "title": "New row",
+      "title": "Traffic",
       "type": "row"
     },
     {
@@ -1403,6 +1376,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1435,7 +1409,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1451,7 +1425,7 @@
         "h": 14,
         "w": 12,
         "x": 0,
-        "y": 38
+        "y": 37
       },
       "id": 21,
       "options": {
@@ -1466,20 +1440,23 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_conn{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_connections{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend conn. success",
+          "range": true,
           "refId": "A",
           "step": 60
         },
@@ -1488,9 +1465,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_recycle{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_recycles{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend conn. recycles",
+          "range": true,
           "refId": "B",
           "step": 60
         },
@@ -1499,9 +1478,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_reuse{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_reuses{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend conn. reuses",
+          "range": true,
           "refId": "C",
           "step": 60
         },
@@ -1510,9 +1491,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_fail{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_failed{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend conn. failures",
+          "range": true,
           "refId": "D",
           "step": 60
         },
@@ -1521,9 +1504,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_unhealthy{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_unhealthy{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend conn. not attempted",
+          "range": true,
           "refId": "E",
           "step": 60
         },
@@ -1532,9 +1517,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_busy{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_busy{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend conn. too many",
+          "range": true,
           "refId": "F",
           "step": 60
         },
@@ -1543,9 +1530,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_req{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_req{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend requests made",
+          "range": true,
           "refId": "G",
           "step": 60
         },
@@ -1554,9 +1543,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_main_backend_retry{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_main_backend_retries{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Backend conn. retry",
+          "range": true,
           "refId": "H",
           "step": 60
         },
@@ -1565,9 +1556,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "rate(varnish_backend_conn{instance=~\"^($varnish_instance).*\"}[1m])",
+          "editorMode": "code",
+          "expr": "rate(varnish_backend_connections{instance=~\"^($varnish_instance).*\"}[5m])",
           "intervalFactor": 2,
           "legendFormat": "Concurrent connections to backend",
+          "range": true,
           "refId": "I",
           "step": 60
         }
@@ -1593,6 +1586,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1624,7 +1618,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1640,7 +1634,7 @@
         "h": 14,
         "w": 12,
         "x": 12,
-        "y": 38
+        "y": 37
       },
       "id": 19,
       "options": {
@@ -1655,20 +1649,23 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "sum by(type) (rate(varnish_main_sessions{instance=~\"^($varnish_instance).*\"}[1m]))",
+          "editorMode": "code",
+          "expr": "sum by(type) (rate(varnish_main_sess{instance=~\"^($varnish_instance).*\"}[5m]))",
           "intervalFactor": 2,
           "legendFormat": "session - {{type}}",
+          "range": true,
           "refId": "A",
           "step": 60
         }
@@ -1694,6 +1691,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1725,7 +1723,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1741,7 +1739,7 @@
         "h": 14,
         "w": 12,
         "x": 0,
-        "y": 52
+        "y": 51
       },
       "id": 20,
       "options": {
@@ -1755,21 +1753,24 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_threads_created{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_thread_created{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Threads created",
           "metric": "varnish_main_threads_created",
+          "range": true,
           "refId": "A",
           "step": 60
         },
@@ -1778,9 +1779,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_threads_destroyed{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_thread_destroyed{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Threads destroyed",
+          "range": true,
           "refId": "B",
           "step": 60
         },
@@ -1789,9 +1792,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_threads_failed{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_thread_failed{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Thread creation failed",
+          "range": true,
           "refId": "C",
           "step": 60
         },
@@ -1800,9 +1805,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_threads_limited{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_thread_limited{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Max Threads hit",
+          "range": true,
           "refId": "D",
           "step": 60
         },
@@ -1811,9 +1818,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_threads{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_thread_live{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Total number of threads",
+          "range": true,
           "refId": "E",
           "step": 60
         },
@@ -1822,9 +1831,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_thread_queue_len{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_thread_queue_length{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Length of session queue waiting for threads",
+          "range": true,
           "refId": "F",
           "step": 60
         },
@@ -1846,28 +1857,15 @@
     },
     {
       "collapsed": false,
-      "datasource": {
-        "type": "loki",
-        "uid": "lokiUID"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 66
+        "y": 65
       },
       "id": 29,
       "panels": [],
-      "targets": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "lokiUID"
-          },
-          "refId": "A"
-        }
-      ],
-      "title": "New row",
+      "title": "Bans",
       "type": "row"
     },
     {
@@ -1887,6 +1885,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1918,7 +1917,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1934,7 +1933,7 @@
         "h": 12,
         "w": 12,
         "x": 0,
-        "y": 67
+        "y": 66
       },
       "id": 22,
       "options": {
@@ -1949,11 +1948,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
@@ -2045,6 +2045,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -2076,7 +2077,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -2092,7 +2093,7 @@
         "h": 12,
         "w": 12,
         "x": 12,
-        "y": 67
+        "y": 66
       },
       "id": 23,
       "options": {
@@ -2107,20 +2108,23 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_bans_persisted_bytes{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_ban_persisted_bytes{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Bytes used by the persisted ban lists",
+          "range": true,
           "refId": "K",
           "step": 60
         },
@@ -2129,9 +2133,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_bans_persisted_fragmentation{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_ban_persisted_fragmentation{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Extra bytes in persisted ban lists due to fragmentation",
+          "range": true,
           "refId": "L",
           "step": 60
         }
@@ -2157,6 +2163,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -2188,7 +2195,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -2204,7 +2211,7 @@
         "h": 12,
         "w": 12,
         "x": 0,
-        "y": 79
+        "y": 78
       },
       "id": 24,
       "options": {
@@ -2219,20 +2226,23 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.3",
+      "pluginVersion": "12.1.1",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_bans_lurker_contention{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_ban_lurker_contention{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Lurker gave way for lookup",
+          "range": true,
           "refId": "E",
           "step": 60
         },
@@ -2241,9 +2251,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_bans_lurker_obj_killed{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_ban_lurker_obj_killed{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Objects killed by bans (lurker)",
+          "range": true,
           "refId": "F",
           "step": 60
         },
@@ -2252,9 +2264,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_bans_lurker_tested{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_ban_lurker_tested{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Bans tested against objects (lurker)",
+          "range": true,
           "refId": "G",
           "step": 60
         },
@@ -2263,9 +2277,11 @@
             "type": "prometheus",
             "uid": "prometheusUID"
           },
-          "expr": "varnish_main_bans_lurker_tests_tested{instance=~\"^($varnish_instance).*\"}",
+          "editorMode": "code",
+          "expr": "varnish_main_ban_lurker_test_tested{instance=~\"^($varnish_instance).*\"}",
           "intervalFactor": 2,
           "legendFormat": "Ban tests tested against objects (lurker)",
+          "range": true,
           "refId": "H",
           "step": 60
         }
@@ -2275,14 +2291,14 @@
       "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "",
-  "schemaVersion": 39,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
           "text": "All",
           "value": "$__all"
         },
@@ -2291,30 +2307,23 @@
           "uid": "prometheusUID"
         },
         "definition": "",
-        "hide": 0,
         "includeAll": true,
         "label": "Instance",
-        "multi": false,
         "name": "varnish_instance",
         "options": [],
         "query": "label_values(varnish_up, instance)",
         "refresh": 1,
         "regex": "/^(.*):/",
-        "skipUrlSync": false,
         "sort": 1,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
+        "type": "query"
       }
     ]
   },
   "time": {
-    "from": "2024-08-13T15:34:27.201Z",
-    "to": "2024-08-13T16:54:27.233Z"
+    "from": "now-30m",
+    "to": "now"
   },
   "timepicker": {
-    "now": true,
     "nowDelay": "",
     "refresh_intervals": [
       "5s",
@@ -2327,22 +2336,10 @@
       "1h",
       "2h",
       "1d"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
     ]
   },
   "timezone": "browser",
   "title": "Varnish metrics",
-  "uid": "ecbe1e96-9e52-40b6-b7ce-742538729dd8",
-  "version": 1,
-  "weekStart": ""
+  "uid": "1a971f36-5c06-4f15-a39a-be26dee94394",
+  "version": 2
 }
