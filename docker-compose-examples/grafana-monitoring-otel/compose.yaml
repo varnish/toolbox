@@ -7,20 +7,13 @@ services:
     depends_on:
       - varnish
 
-  varnish:
-    hostname: varnish
-    #platform: linux/amd64 # Uncomment this line when running on Apple M1
+  mkfs:
+    user: root
     volumes:
-      - workdir:/var/lib/varnish
-      - ./conf/varnish-enterprise.lic:/etc/varnish/varnish-enterprise.lic
-      - ./conf/default.vcl:/etc/varnish/default.vcl
-    command: varnishd -F -a :80 -f /etc/varnish/default.vcl -n varnish -p esi_limit=1
-    ports:
-      - "8080:80"
-    depends_on:
-      - origin-files
-      - origin-esi
-    build:
+      - ./mse4.conf:/etc/varnish/mse4.conf
+      - ./data/mse/disk:/var/lib/mse/disk
+    command: mkfs.mse4 -f -c /etc/varnish/mse4.conf configure
+    build: &varnish_build
       dockerfile_inline: |
         FROM debian:bookworm-slim
         RUN set -ex; \
@@ -28,6 +21,27 @@ services:
           apt-get install -y curl; \
           curl -s https://packagecloud.io/install/repositories/varnishplus/60-enterprise/script.deb.sh | bash; \
           apt-get install -y varnish-plus
+
+  varnish:
+    hostname: varnish
+    #platform: linux/amd64 # Uncomment this line when running on Apple M1
+    volumes:
+      - ./mse4.conf:/etc/varnish/mse4.conf
+      - ./data/mse/disk:/var/lib/mse/disk
+      - workdir:/var/lib/varnish
+      - ./conf/varnish-enterprise.lic:/etc/varnish/varnish-enterprise.lic
+      - ./conf/default.vcl:/etc/varnish/default.vcl
+    command: varnishd -F -a :80 -f /etc/varnish/default.vcl -n varnish -p esi_limit=1 -s mse4,/etc/varnish/mse4.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      origin-files:
+        condition: service_started
+      origin-esi:
+        condition: service_started
+      mkfs:
+        condition: service_completed_successfully
+    build: *varnish_build
 
   origin-files: &origin
     command: /app/main origin-files
