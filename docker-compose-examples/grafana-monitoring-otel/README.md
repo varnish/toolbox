@@ -9,7 +9,6 @@ Using `opentelemetry` simplifies the process quite a bit and notably introduces 
 - login with `admin:password`
 - you should see the dashboard, and you can check the various data sources in the `Explore` tab
 
-Note that by default, data is batched before being sent, so allows some time for the metrics to show up in the dashboards.
 
 Credits:
 - the metrics dashboard comes from the [grafana repository](https://grafana.com/grafana/dashboards/9903-varnish/)
