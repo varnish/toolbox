@@ -3,13 +3,15 @@ Using `opentelemetry` simplifies the process quite a bit and notably introduces 
 
 # Getting started
 
-- place the license file ( `varnish-enterprise.lic`, you can ask for one [here](https://www.varnish-software.com/contact-us/))
+First, login to docker using your Varnish Enterprise Credentials. More details can be found [here in the documentation](https://docs.varnish-software.com/docker/).
+
+- set `VARNISH_EXPERIMENTAL_TOKEN` in `.env` with your Varnish Enterprise Experimental repository token, you can ask for one [here](https://www.varnish-software.com/contact-us/))
 - run "docker compose up -d"
 - go to http://localhost:3000
 - login with `admin:password`
 - you should see the dashboard, and you can check the various data sources in the `Explore` tab
 
-Note that by default, data is batched before being sent, so allows some time for the metrics to show up in the dashboards.
+Note that by default, data is batched before being sent, so allow some time for the metrics to show up in the dashboards.
 
 Credits:
 - the metrics dashboard comes from the [grafana repository](https://grafana.com/grafana/dashboards/9903-varnish/)
