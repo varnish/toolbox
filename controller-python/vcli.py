@@ -75,9 +75,8 @@ class Vcli:
 
             except requests.RequestException as e:
                 raise Exception(f"Login failed: {e}")
-                return None
 
-    def query_endpoint(self, ep, params=None):
+    def query_endpoint(self, ep, params=None, method="GET"):
         url = f"{self.endpoint}{ep}"
 
         # check if token is valid?
@@ -85,10 +84,10 @@ class Vcli:
 
         headers = {"Authorization": f"Bearer {token}"}
         try:
-            response = requests.get(url, headers=headers, params=params)
+            response = requests.request(method, url, headers=headers, params=params)
             response.raise_for_status()
 
-            return response.json()
+            return response.json() if response.text else None
 
         except requests.RequestException as e:
-            print(f"Error fetching agents: {e}")
+            raise Exception(f"Error with {method} ${ep}: {e}")
