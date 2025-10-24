@@ -1515,7 +1515,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(rate(varnish_main_bans_obj_killed[$__rate_interval]))",
+          "expr": "sum(rate(varnish_main_ban_obj_killed[$__rate_interval]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Objects killed by bans (lookup)",
@@ -1528,7 +1528,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(rate(varnish_main_bans_lurker_obj_killed[$__rate_interval]))",
+          "expr": "sum(rate(varnish_main_ban_lurker_obj_killed[$__rate_interval]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Objects killed by bans (lurker)",
@@ -1541,7 +1541,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(rate(varnish_main_bans_lurker_obj_killed_cutoff[$__rate_interval]))",
+          "expr": "sum(rate(varnish_main_ban_lurker_obj_killed_cutoff[$__rate_interval]))",
           "hide": false,
           "instant": false,
           "legendFormat": "Objects killed by bans for cutoff (lurker)",
@@ -3189,7 +3189,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(varnish_brotli_c_testunbr_fail[$__rate_interval])",
+          "expr": "rate(varnish_brotli_test_decompression_fail[$__rate_interval])",
           "format": "time_series",
           "fullMetaSearch": false,
           "hide": false,
@@ -3206,7 +3206,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "rate(varnish_brotli_c_unbr_fail[$__rate_interval])",
+          "expr": "rate(varnish_brotli_decompression_fail[$__rate_interval])",
           "hide": false,
           "instant": false,
           "legendFormat": "Brotli decompression Failures",
@@ -3371,7 +3371,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(varnish_mse4_book_slots_used)/sum(varnish_mse4_book_slots_used + varnish_mse4_book_slots_unused)",
+          "expr": "sum(varnish_mse4_book_slot_used)/sum(varnish_mse4_book_slot_used + varnish_mse4_book_slot_unused)",
           "hide": false,
           "instant": false,
           "legendFormat": "Book slots",
@@ -3384,7 +3384,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(varnish_mse4_bytes_used)/sum(varnish_mse4_bytes_used + varnish_mse4_bytes_unused)",
+          "expr": "sum(varnish_mse4_byte_used)/sum(varnish_mse4_byte_used + varnish_mse4_byte_unused)",
           "hide": false,
           "instant": false,
           "legendFormat": "Memory",
@@ -3498,7 +3498,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(varnish_mse4_objects)",
+          "expr": "sum(varnish_mse4_object_used)",
           "hide": false,
           "instant": false,
           "legendFormat": "All objects",
@@ -3511,7 +3511,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "varnish_mse4_g_objects_ephemeral",
+          "expr": "varnish_mse4_object_ephemeral",
           "hide": false,
           "instant": false,
           "legendFormat": "Ephemeral objects",
@@ -3524,7 +3524,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(varnish_mse4_objects_persisted)",
+          "expr": "sum(varnish_mse4_object_persisted)",
           "hide": false,
           "instant": false,
           "legendFormat": "Persisted objects with at least one chunk in memory",
@@ -3864,7 +3864,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(varnish_main_mse4_g_ykey_keys)",
+          "expr": "sum(varnish_mse4_g_ykey_keys)",
           "hide": false,
           "instant": false,
           "legendFormat": "In total",
@@ -3877,7 +3877,7 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "sum(varnish_mse4_book_g_ykey_keys)",
+          "expr": "sum(varnish_mse4_book_ykey_keys)",
           "hide": false,
           "instant": false,
           "legendFormat": "in book {{mse4_book}}",
