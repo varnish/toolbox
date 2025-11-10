@@ -8,6 +8,7 @@ services:
       - varnish
 
   mkfs:
+    #platform: linux/amd64 # Uncomment this line when running on Apple M1
     user: root
     volumes:
       - ./mse4.conf:/etc/varnish/mse4.conf
