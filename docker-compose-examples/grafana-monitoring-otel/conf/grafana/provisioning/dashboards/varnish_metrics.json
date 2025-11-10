@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 2,
+  "id": 0,
   "links": [],
   "panels": [
     {
@@ -63,7 +63,7 @@
             "h": 6,
             "w": 2,
             "x": 0,
-            "y": 0
+            "y": 1
           },
           "id": 132,
           "options": {
@@ -130,7 +130,7 @@
             "h": 6,
             "w": 4,
             "x": 2,
-            "y": 0
+            "y": 1
           },
           "id": 129,
           "options": {
@@ -199,7 +199,7 @@
             "h": 6,
             "w": 4,
             "x": 6,
-            "y": 0
+            "y": 1
           },
           "id": 130,
           "options": {
@@ -268,7 +268,7 @@
             "h": 6,
             "w": 4,
             "x": 10,
-            "y": 0
+            "y": 1
           },
           "id": 91,
           "options": {
@@ -403,7 +403,7 @@
             "h": 6,
             "w": 3,
             "x": 14,
-            "y": 0
+            "y": 1
           },
           "id": 100,
           "options": {
@@ -477,7 +477,7 @@
             "h": 6,
             "w": 3,
             "x": 17,
-            "y": 0
+            "y": 1
           },
           "id": 99,
           "options": {
@@ -563,7 +563,7 @@
             "h": 6,
             "w": 4,
             "x": 20,
-            "y": 0
+            "y": 1
           },
           "id": 116,
           "options": {
@@ -690,7 +690,7 @@
             "h": 12,
             "w": 9,
             "x": 0,
-            "y": 19
+            "y": 41
           },
           "id": 127,
           "options": {
@@ -848,7 +848,7 @@
             "h": 12,
             "w": 7,
             "x": 9,
-            "y": 19
+            "y": 41
           },
           "id": 95,
           "options": {
@@ -994,7 +994,7 @@
             "h": 12,
             "w": 8,
             "x": 16,
-            "y": 19
+            "y": 41
           },
           "id": 135,
           "options": {
@@ -1058,7 +1058,7 @@
       "type": "row"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1066,462 +1066,463 @@
         "y": 1
       },
       "id": 21,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Requests per second",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 8,
+            "x": 0,
+            "y": 2
+          },
+          "id": 30,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_esi_requests[$__rate_interval]))",
+              "instant": false,
+              "legendFormat": "{{host}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "ESI subrequests",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Operations",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "reqps"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/[bB]ans/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "right"
+                  },
+                  {
+                    "id": "unit"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 8,
+            "x": 8,
+            "y": 2
+          },
+          "id": 110,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_purges[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Number of purge operations executed",
+              "range": true,
+              "refId": "Purges"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_bans[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Active Bans",
+              "range": true,
+              "refId": "Bans"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_ykey_purges[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "YKey purge operations",
+              "range": true,
+              "refId": "Ykey purges"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_ban_req[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Lurker-unfriendly bans",
+              "range": true,
+              "refId": "Lurker-unfriendly bans"
+            }
+          ],
+          "title": "Cache invalidation requests",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Objects invalidated",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "cps"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 8,
+            "x": 16,
+            "y": 2
+          },
+          "id": 109,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_mse4_book_c_ykey_purged[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Number of objects purged with YKey",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_mse4_book_ykey_slicer_purged[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Number of slicer objects purged with YKey (MSE4)",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_obj_purged[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Number of purged objects",
+              "range": true,
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_ban_obj_killed[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Objects killed by bans (lookup)",
+              "range": true,
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_ban_lurker_obj_killed[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Objects killed by bans (lurker)",
+              "range": true,
+              "refId": "E"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "sum(rate(varnish_main_ban_lurker_obj_killed_cutoff[$__rate_interval]))",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Objects killed by bans for cutoff (lurker)",
+              "range": true,
+              "refId": "F"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheusUID"
+              },
+              "editorMode": "code",
+              "expr": "rate(varnish_mse3_store_ykey_purged[$__rate_interval])",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "Number of slicer objects purged with YKey (MSE3)",
+              "range": true,
+              "refId": "G"
+            }
+          ],
+          "title": "Objects invalidated",
+          "type": "timeseries"
+        }
+      ],
       "title": "Traffic",
       "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheusUID"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Requests per second",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 13,
-        "w": 8,
-        "x": 0,
-        "y": 2
-      },
-      "id": 30,
-      "options": {
-        "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "last"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_esi_requests[$__rate_interval]))",
-          "instant": false,
-          "legendFormat": "{{host}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "ESI subrequests",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheusUID"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Operations",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/[bB]ans/"
-            },
-            "properties": [
-              {
-                "id": "custom.axisPlacement",
-                "value": "right"
-              },
-              {
-                "id": "unit"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 13,
-        "w": 8,
-        "x": 8,
-        "y": 2
-      },
-      "id": 110,
-      "options": {
-        "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "last"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_purges[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Number of purge operations executed",
-          "range": true,
-          "refId": "Purges"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_bans[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Active Bans",
-          "range": true,
-          "refId": "Bans"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_ykey_purges[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "YKey purge operations",
-          "range": true,
-          "refId": "Ykey purges"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_ban_req[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Lurker-unfriendly bans",
-          "range": true,
-          "refId": "Lurker-unfriendly bans"
-        }
-      ],
-      "title": "Cache invalidation requests",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheusUID"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Objects invalidated",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "cps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 13,
-        "w": 8,
-        "x": 16,
-        "y": 2
-      },
-      "id": 109,
-      "options": {
-        "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "last"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_mse4_book_c_ykey_purged[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Number of objects purged with YKey",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_mse4_book_ykey_slicer_purged[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Number of slicer objects purged with YKey (MSE4)",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_obj_purged[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Number of purged objects",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_ban_obj_killed[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Objects killed by bans (lookup)",
-          "range": true,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_ban_lurker_obj_killed[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Objects killed by bans (lurker)",
-          "range": true,
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(varnish_main_ban_lurker_obj_killed_cutoff[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Objects killed by bans for cutoff (lurker)",
-          "range": true,
-          "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "rate(varnish_mse3_store_ykey_purged[$__rate_interval])",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "Number of slicer objects purged with YKey (MSE3)",
-          "range": true,
-          "refId": "G"
-        }
-      ],
-      "title": "Objects invalidated",
-      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -1529,12 +1530,12 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 2
       },
       "id": 137,
       "panels": [],
       "repeat": "instance",
-      "title": "Heatmaps",
+      "title": "Latency and Throughput",
       "type": "row"
     },
     {
@@ -1542,7 +1543,7 @@
         "type": "prometheus",
         "uid": "prometheusUID"
       },
-      "description": "This heatmap shows the TTFB (Avg)",
+      "description": "This heatmap shows the Avg. Time to First Byte (TTFB)",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1562,7 +1563,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 16
+        "y": 3
       },
       "id": 138,
       "options": {
@@ -1630,7 +1631,7 @@
         "type": "prometheus",
         "uid": "prometheusUID"
       },
-      "description": "TTFB 95th percentile (p95) from the histogram bucket",
+      "description": "Time to First Byte (TTFB) 95th percentile (p95) from the histogram bucket",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1671,7 +1672,7 @@
         "h": 7,
         "w": 11,
         "x": 12,
-        "y": 16
+        "y": 3
       },
       "id": 139,
       "options": {
@@ -1705,7 +1706,7 @@
           "expr": "histogram_quantile(0.95, sum(rate(varnish_client_duration_ttfb_seconds_bucket[$__rate_interval])) by (le))",
           "hide": false,
           "instant": false,
-          "legendFormat": "Client",
+          "legendFormat": "Client Side",
           "range": true,
           "refId": "B"
         }
@@ -1718,7 +1719,7 @@
         "type": "prometheus",
         "uid": "prometheusUID"
       },
-      "description": "This heatmap shows the TTFB (Avg)",
+      "description": "This heatmap shows the Avg. Time to Last Byte (TTFB)",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1738,7 +1739,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 23
+        "y": 10
       },
       "id": 142,
       "options": {
@@ -1780,7 +1781,7 @@
         {
           "editorMode": "code",
           "expr": "sum(rate(varnish_client_duration_total_seconds_sum[$__rate_interval]))",
-          "legendFormat": " Client TTFB (sec)",
+          "legendFormat": " Client TTLB (sec)",
           "range": true,
           "refId": "A"
         },
@@ -1793,7 +1794,7 @@
           "expr": "sum(rate(varnish_backend_duration_total_seconds_sum[$__rate_interval]))",
           "hide": false,
           "instant": false,
-          "legendFormat": " Backend TTFB (secs)",
+          "legendFormat": " Backend TTLB (secs)",
           "range": true,
           "refId": "B"
         }
@@ -1806,7 +1807,7 @@
         "type": "prometheus",
         "uid": "prometheusUID"
       },
-      "description": "Total Time TTLB 95th percentile (p95) from the histogram bucket",
+      "description": "Total Time of Last Byte (TTFB) percentile (p95)",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1847,7 +1848,7 @@
         "h": 7,
         "w": 11,
         "x": 12,
-        "y": 23
+        "y": 10
       },
       "id": 144,
       "options": {
@@ -1881,7 +1882,7 @@
           "expr": "histogram_quantile(0.95, sum(rate(varnish_client_duration_total_seconds_bucket[$__rate_interval])) by (le))",
           "hide": false,
           "instant": false,
-          "legendFormat": "Client",
+          "legendFormat": "Client Side",
           "range": true,
           "refId": "B"
         }
@@ -1894,7 +1895,7 @@
         "type": "prometheus",
         "uid": "prometheusUID"
       },
-      "description": "This heatmap show total data transferred per second,",
+      "description": "This heatmap show total data transferred in bits per second",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1914,7 +1915,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 30
+        "y": 17
       },
       "id": 143,
       "options": {
@@ -2049,7 +2050,7 @@
         "h": 7,
         "w": 11,
         "x": 12,
-        "y": 30
+        "y": 17
       },
       "id": 141,
       "options": {
@@ -2123,7 +2124,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 24
       },
       "id": 88,
       "panels": [
@@ -2199,7 +2200,7 @@
             "h": 10,
             "w": 8,
             "x": 0,
-            "y": 0
+            "y": 108
           },
           "id": 131,
           "options": {
@@ -2315,7 +2316,7 @@
             "h": 5,
             "w": 8,
             "x": 8,
-            "y": 0
+            "y": 108
           },
           "id": 93,
           "options": {
@@ -2422,7 +2423,7 @@
             "h": 5,
             "w": 8,
             "x": 16,
-            "y": 0
+            "y": 108
           },
           "id": 68,
           "options": {
@@ -2529,7 +2530,7 @@
             "h": 5,
             "w": 8,
             "x": 8,
-            "y": 18
+            "y": 113
           },
           "id": 69,
           "options": {
@@ -2662,7 +2663,7 @@
             "h": 5,
             "w": 8,
             "x": 16,
-            "y": 18
+            "y": 113
           },
           "id": 97,
           "options": {
@@ -2782,7 +2783,7 @@
             "h": 5,
             "w": 8,
             "x": 0,
-            "y": 23
+            "y": 118
           },
           "id": 136,
           "options": {
@@ -2897,7 +2898,7 @@
             "h": 5,
             "w": 8,
             "x": 8,
-            "y": 23
+            "y": 118
           },
           "id": 92,
           "options": {
@@ -3306,7 +3307,7 @@
             "h": 5,
             "w": 8,
             "x": 16,
-            "y": 23
+            "y": 118
           },
           "id": 48,
           "options": {
@@ -3451,7 +3452,7 @@
             "h": 5,
             "w": 8,
             "x": 0,
-            "y": 28
+            "y": 123
           },
           "id": 98,
           "options": {
@@ -3696,7 +3697,7 @@
             "h": 5,
             "w": 8,
             "x": 8,
-            "y": 28
+            "y": 123
           },
           "id": 79,
           "options": {
@@ -3831,7 +3832,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 25
       },
       "id": 89,
       "panels": [
@@ -3902,7 +3903,7 @@
             "h": 5,
             "w": 8,
             "x": 0,
-            "y": 1
+            "y": 109
           },
           "id": 102,
           "options": {
@@ -3926,7 +3927,7 @@
                 "uid": "prometheusUID"
               },
               "editorMode": "code",
-              "expr": "sum(varnish_mse4_book_slot_used)/sum(varnish_mse4_book_slot_used + varnish_mse4_book_slot_unused)",
+              "expr": "varnish_mse4",
               "hide": false,
               "instant": false,
               "legendFormat": "Book slots",
@@ -4030,7 +4031,7 @@
             "h": 5,
             "w": 8,
             "x": 8,
-            "y": 1
+            "y": 109
           },
           "id": 108,
           "options": {
@@ -4158,7 +4159,7 @@
             "h": 5,
             "w": 8,
             "x": 16,
-            "y": 1
+            "y": 109
           },
           "id": 106,
           "options": {
@@ -4297,7 +4298,7 @@
             "h": 5,
             "w": 8,
             "x": 0,
-            "y": 19
+            "y": 114
           },
           "id": 133,
           "options": {
@@ -4397,7 +4398,7 @@
             "h": 5,
             "w": 8,
             "x": 8,
-            "y": 19
+            "y": 114
           },
           "id": 111,
           "options": {
@@ -4512,7 +4513,7 @@
             "h": 5,
             "w": 8,
             "x": 16,
-            "y": 19
+            "y": 114
           },
           "id": 112,
           "options": {
@@ -4614,7 +4615,7 @@
             "h": 5,
             "w": 8,
             "x": 0,
-            "y": 24
+            "y": 119
           },
           "id": 104,
           "options": {
@@ -4698,7 +4699,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 26
       },
       "id": 113,
       "panels": [
@@ -4766,7 +4767,7 @@
             "h": 5,
             "w": 12,
             "x": 0,
-            "y": 15
+            "y": 158
           },
           "id": 117,
           "options": {
@@ -4880,7 +4881,7 @@
     ]
   },
   "time": {
-    "from": "now-30h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -4898,6 +4899,6 @@
   },
   "timezone": "",
   "title": "Varnish metrics",
-  "uid": "d96e0b09-246c-4a1f-b924-oodvar",
-  "version": 1
+  "uid": "adz7nrj",
+  "version": 3
 }
