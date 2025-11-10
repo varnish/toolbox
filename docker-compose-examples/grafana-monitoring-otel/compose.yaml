@@ -8,6 +8,7 @@ services:
       - varnish
 
   mkfs:
+    platform: linux/amd64
     user: root
     volumes:
       - ./mse4.conf:/etc/varnish/mse4.conf
@@ -24,7 +25,7 @@ services:
 
   varnish:
     hostname: varnish
-    #platform: linux/amd64 # Uncomment this line when running on Apple M1
+    platform: linux/amd64
     volumes:
       - ./mse4.conf:/etc/varnish/mse4.conf
       - ./data/mse/disk:/var/lib/mse/disk
@@ -67,7 +68,7 @@ services:
   exporter:
     command: varnish-otel
     entrypoint: []
-    #platform: linux/amd64 # Uncomment this line when running on Apple M1
+    platform: linux/amd64
     user: root
     volumes:
       - workdir:/var/lib/varnish
