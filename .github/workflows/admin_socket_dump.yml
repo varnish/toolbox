@@ -1,0 +1,27 @@
+name: admin_socket_dump Tests
+
+on:
+  push:
+    paths:
+      - 'admin_socket_dump/**'
+  pull_request:
+    paths:
+      - 'admin_socket_dump/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+      
+      - name: Run test suite
+        run: |
+          cd admin_socket_dump
+          test/test_suite.sh

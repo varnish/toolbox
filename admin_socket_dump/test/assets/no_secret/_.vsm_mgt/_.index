@@ -1,0 +1,2 @@
+# Only -T, no -S
++ _.Arg.t_file 0 32 Arg -T
