@@ -1,0 +1,3 @@
+# Normal case with both -T and -S
++ _.Arg.t_file 0 32 Arg -T
++ _.Arg.s_file 0 40 Arg -S
