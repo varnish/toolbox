@@ -2,6 +2,7 @@ vcl 4.1;
 
 import vtc;
 import std;
+import ykey;
 
 include "otel.vcl";
 
@@ -9,6 +10,7 @@ backend esi { .host = "origin-esi"; }
 backend files { .host = "origin-files"; }
 
 sub vcl_recv {
+	otel.route(req.url);
 	if (req.url ~ "esi") {
 		set req.backend_hint = esi;
 	} else {
@@ -17,7 +19,7 @@ sub vcl_recv {
 
 	# don't cache if the request path or querystring contains uncacheable
 	if (req.url ~ "uncacheable" || req.url ~ "esi") {
-		return (pass);
+		return (hash);
 	# create a synthetic response for heathcheck requests
 	} else if (req.url == "/healthcheck") {
 		return (synth(200));
@@ -28,6 +30,11 @@ sub vcl_recv {
 }
 
 sub vcl_backend_response {
+	# just creating some ykey action to fill the graphs
+	ykey.add_key(bereq.url);
+	ykey.purge_keys(bereq.url);
+
+	otel.route(bereq.url);
 	set beresp.do_esi = true;
 	if (bereq.url == "/esi_sub1" && bereq.retries == 1) {
 		std.log("taking a break, I need it");
@@ -36,11 +43,5 @@ sub vcl_backend_response {
 	if (bereq.url == "/esi_sub1" && bereq.retries < 3) {
 		return(retry);
 	}
-	set beresp.ttl = 10s;
-}
-
-#include "verbose_builtin.vcl";
-
-sub vcl_backend_response {
-	set beresp.ttl = 1y;
+	set beresp.ttl = 50s;
 }

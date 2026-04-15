@@ -123,8 +123,16 @@ func main() {
 			"/esi_sub2": `World`,
 		}
 
-		if req.URL.Path == "/esi_sub2" && rand.Int31n(20) == 0 {
-			time.Sleep(955 * time.Millisecond)
+		switch req.URL.Path {
+		case "/esi_top":
+			time.Sleep(time.Duration(175 + rand.Int63n(50)) * time.Millisecond)
+		case "/esi_sub1":
+			time.Sleep(time.Duration(290 + rand.Int63n(20)) * time.Millisecond)
+		case "/esi_sub2":
+			if rand.Int31n(20) == 0 {
+				time.Sleep(955 * time.Millisecond)
+			}
+			time.Sleep(time.Duration(700 + rand.Int63n(200)) * time.Millisecond)
 		}
 		ctx := req.Context()
 		requestCount.Add(ctx, 1, metric.WithAttributes(commonLabels...))

@@ -14,18 +14,9 @@ services:
       - ./mse4.conf:/etc/varnish/mse4.conf
       - ./data/mse/disk:/var/lib/mse/disk
     command: mkfs.mse4 -f -c /etc/varnish/mse4.conf configure
-    build: &varnish_build
-      dockerfile_inline: |
-        FROM debian:bookworm-slim
-        RUN set -ex; \
-          apt-get update; \
-          apt-get install -y curl; \
-          curl -s https://packagecloud.io/install/repositories/varnishplus/60-enterprise/script.deb.sh | bash; \
-          apt-get install -y varnish-plus
+    image: varnish/varnish-enterprise
 
   varnish:
-    hostname: varnish
-    platform: linux/amd64
     volumes:
       - ./mse4.conf:/etc/varnish/mse4.conf
       - ./data/mse/disk:/var/lib/mse/disk
@@ -42,7 +33,27 @@ services:
         condition: service_started
       mkfs:
         condition: service_completed_successfully
-    build: *varnish_build
+    image: varnish/varnish-enterprise
+    user: root
+
+  varnish-otel:
+    image: varnish/varnish-enterprise
+    command: varnish-otel
+    volumes:
+      - workdir:/var/lib/varnish
+    depends_on:
+      - varnish
+    environment:
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://loki:3100/otlp/v1/logs
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://tempo:4318/v1/traces
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: varnish
+      OTEL_VARNISH_WORKDIR: varnish
+    build:
+      dockerfile_inline: |
+        FROM varnish/varnish-enterprise
+        COPY varnish-otel /usr/bin/varnish-otel
 
   origin-files: &origin
     command: /app/main origin-files
@@ -65,29 +76,6 @@ services:
     <<: *origin
     command: /app/main origin-esi
 
-  exporter:
-    command: varnish-otel
-    entrypoint: []
-    platform: linux/amd64
-    user: root
-    volumes:
-      - workdir:/var/lib/varnish
-    depends_on:
-      - varnish
-    environment:
-      <<: *otel_env
-      OTEL_SERVICE_NAME: varnish
-      OTEL_VARNISH_WORKDIR: varnish
-      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
-    build:
-      dockerfile_inline: |
-        FROM debian:bookworm-slim
-        RUN set -ex; \
-          apt-get update; \
-          apt-get install -y curl; \
-          curl -s https://packagecloud.io/install/repositories/varnishplus/60-enterprise/script.deb.sh | bash; \
-          apt-get install -y varnish-otel
-
   grafana:
     image: grafana/grafana-enterprise
     ports:
@@ -105,10 +93,10 @@ services:
       - ./conf/tempo.yaml:/etc/tempo.yaml
 
   prometheus:
-    image: prom/prometheus:v2.53.0
+    image: prom/prometheus:v3
     volumes:
       - ./conf/prometheus.yml:/etc/prometheus/prometheus.yml
-    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --enable-feature=otlp-write-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
+    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.enable-otlp-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
 
   loki:
     image: grafana/loki:3.1.0
