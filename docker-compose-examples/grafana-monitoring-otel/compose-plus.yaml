@@ -2,12 +2,22 @@ include:
   - compose-common.yaml
 
 services:
-  varnish:
-    image: varnish
+  mkfs:
+    user: root
     volumes:
+      - ./mse4.conf:/etc/varnish/mse4.conf
+      - ./data/mse/disk:/var/lib/mse/disk
+    command: mkfs.mse4 -f -c /etc/varnish/mse4.conf configure
+    image: varnish/varnish-enterprise
+
+  varnish:
+    volumes:
+      - ./mse4.conf:/etc/varnish/mse4.conf
+      - ./data/mse/disk:/var/lib/mse/disk
       - workdir:/var/lib/varnish
-      - ./conf/default.vcl:/etc/varnish/default.vcl
-    command: varnishd -F -a :80 -f /etc/varnish/default.vcl
+      - ./conf/varnish-enterprise.lic:/etc/varnish/varnish-enterprise.lic
+      - ./conf/default-plus.vcl:/etc/varnish/default.vcl
+    command: varnishd -F -a :80 -f /etc/varnish/default.vcl -n varnish -p esi_limit=1 -s mse4,/etc/varnish/mse4.conf
     ports:
       - "8080:80"
     depends_on:
@@ -15,31 +25,25 @@ services:
         condition: service_started
       origin-esi:
         condition: service_started
+      mkfs:
+        condition: service_completed_successfully
+    image: varnish/varnish-enterprise
+    user: root
 
   varnish-otel:
-    image: varnish
+    image: varnish/varnish-enterprise
     command: varnish-otel
     volumes:
       - workdir:/var/lib/varnish
     depends_on:
       - varnish
     environment:
-      OTEL_RESOURCE_ATTRIBUTES: service.instance.id=varnish1
       OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://loki:3100/otlp/v1/logs
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://tempo:4318/v1/traces
       OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
       OTEL_SERVICE_NAME: varnish
-      #OTEL_VARNISH_WORKDIR: varnish
-    build:
-      dockerfile_inline: |
-        FROM varnish
-        USER root
-        RUN set -ex; \
-            apt-get update; \
-            apt-get install varnish-otel; \
-            rm -rf /var/lib/apt/lists/*
-        USER varnish
+      OTEL_VARNISH_WORKDIR: varnish
 
 volumes:
   workdir:

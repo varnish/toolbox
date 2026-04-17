@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -64,7 +64,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
+        "w": 2,
         "x": 0,
         "y": 1
       },
@@ -131,8 +131,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 2,
         "y": 1
       },
       "id": 129,
@@ -200,8 +200,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 8,
+        "w": 3,
+        "x": 5,
         "y": 1
       },
       "id": 130,
@@ -239,6 +239,75 @@
         }
       ],
       "title": "Serving",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "semi-dark-orange",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 91,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "1 - (sum(rate(varnish_backend_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(varnish_client_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Bytes",
+          "range": true,
+          "refId": "Bytes"
+        }
+      ],
+      "title": "Traffic offload (bytes)",
       "type": "stat"
     },
     {
@@ -315,37 +384,90 @@
         "type": "prometheus",
         "uid": "prometheusUID"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "green",
-            "mode": "fixed"
+            "mode": "thresholds"
           },
           "mappings": [],
+          "max": 2,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "semi-dark-orange",
+                "color": "yellow",
                 "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
               }
             ]
           },
           "unit": "percentunit"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Healthy backends"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sick backends"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
+        "w": 3,
         "x": 16,
         "y": 1
       },
-      "id": 91,
+      "id": 100,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
         "percentChangeColorMode": "standard",
@@ -368,15 +490,90 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "1 - (sum(rate(varnish_backend_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(varnish_client_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))))",
+          "exemplar": false,
+          "expr": "sum(varnish_backend_is_healthy{service_name=~\"$service\",instance=~\"$instance\"}) / count(varnish_backend_is_healthy{service_name=~\"$service\",instance=~\"$instance\"}) ",
           "hide": false,
-          "instant": false,
-          "legendFormat": "Bytes",
-          "range": true,
-          "refId": "Bytes"
+          "instant": true,
+          "legendFormat": "Sick",
+          "range": false,
+          "refId": "sick"
         }
       ],
-      "title": "Traffic offload (bytes)",
+      "title": "Backend Health",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 2,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 19,
+        "y": 1
+      },
+      "id": 99,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(varnish_mse4_store_online{service_name=~\"$service\",instance=~\"$instance\"}) / count(varnish_mse4_store_online{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "Stores offline",
+          "range": false,
+          "refId": "stores offline"
+        }
+      ],
+      "title": "MSE4 stores online",
       "type": "stat"
     },
     {
@@ -410,8 +607,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 20,
+        "w": 2,
+        "x": 22,
         "y": 1
       },
       "id": 116,
@@ -941,8 +1138,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
+        "h": 13,
+        "w": 8,
         "x": 0,
         "y": 20
       },
@@ -997,113 +1194,6 @@
       ],
       "title": "Response Sizes",
       "type": "heatmap"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheusUID"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Failures per second",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 1
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 20
-      },
-      "id": 68,
-      "options": {
-        "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "last"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "12.2.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheusUID"
-          },
-          "editorMode": "code",
-          "expr": "sum by (failure_type) (rate(varnish_main_session_failed{service_name=~\"$service\",instance=~\"$instance\",failure_type!=\"\"}[$__rate_interval]))",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "{{failure_type}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Session failures",
-      "type": "timeseries"
     },
     {
       "datasource": {
@@ -1185,9 +1275,9 @@
         ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
+        "h": 13,
+        "w": 8,
+        "x": 8,
         "y": 20
       },
       "id": 110,
@@ -1236,6 +1326,19 @@
           "legendFormat": "Active Bans",
           "range": true,
           "refId": "Bans"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_main_ykey_purges{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "YKey purge operations",
+          "range": true,
+          "refId": "Ykey purges"
         },
         {
           "datasource": {
@@ -1318,9 +1421,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
+        "h": 13,
+        "w": 8,
+        "x": 16,
         "y": 20
       },
       "id": 109,
@@ -1440,19 +1543,6 @@
       "type": "timeseries"
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 26
-      },
-      "id": 88,
-      "panels": [],
-      "title": "Errors",
-      "type": "row"
-    },
-    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheusUID"
@@ -1516,10 +1606,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
+        "h": 5,
+        "w": 8,
         "x": 0,
-        "y": 27
+        "y": 33
       },
       "id": 30,
       "options": {
@@ -1557,6 +1647,379 @@
       ],
       "title": "ESI subrequests",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 33
+      },
+      "id": 97,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "rate(varnish_main_stale_fetch_delivers{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Stale deliveries",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "rate(varnish_main_stale_fetch_rearms{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Stale object rearmed",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Stale",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "The number of backends that are marked as sick due to failing health probes or being manually set to sick via varnishadm.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 33
+      },
+      "id": 93,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "count by (host_name) (varnish_backend_is_healthy{service_name=~\"$service\",instance=~\"$instance\"}) - sum by (host_name)(varnish_backend_is_healthy{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{host_name}}",
+          "range": true,
+          "refId": "sick"
+        }
+      ],
+      "title": "Sick backends",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 88,
+      "panels": [],
+      "title": "Errors",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "false": {
+                  "index": 1,
+                  "text": "Sick"
+                },
+                "true": {
+                  "index": 0,
+                  "text": "Healthy"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "boolean"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom.viz",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 39
+      },
+      "id": 131,
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum by (backend_name, host_name) (varnish_backend_is_healthy{service_name=~\"$service\",instance=~\"$instance\"})",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Panel Title",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "boolean",
+                "targetField": "Value"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "backend_name",
+            "rowField": "host_name",
+            "valueField": "Value"
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
@@ -1622,10 +2085,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 27
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 39
       },
       "id": 69,
       "options": {
@@ -1706,6 +2169,228 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
+            "axisLabel": "Failures per second",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 39
+      },
+      "id": 68,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum by (failure_type) (rate(varnish_main_session_failed{service_name=~\"$service\",instance=~\"$instance\",failure_type!=\"\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "{{failure_type}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Session failures",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 44
+      },
+      "id": 136,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "count by (host_name) (varnish_mse4_book_online{service_name=~\"$service\",instance=~\"$instance\"}) - sum by (host_name) (varnish_mse4_book_online{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Books offline ({{host_name}})",
+          "range": true,
+          "refId": "books"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "count by (host_name) (varnish_mse4_store_online{service_name=~\"$service\",instance=~\"$instance\"}) - sum by (host_name) (varnish_mse4_store_online{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Stores offline ({{host_name}})",
+          "range": true,
+          "refId": "stores"
+        }
+      ],
+      "title": "MSE4 offline books/stores",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1755,10 +2440,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 27
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 44
       },
       "id": 92,
       "options": {
@@ -2164,10 +2849,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
-        "y": 27
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 44
       },
       "id": 48,
       "options": {
@@ -2246,12 +2931,399 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 49
+      },
+      "id": 98,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_c_eviction_failure{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Object or chunk eviction failures",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_c_allocation_failure{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Allocator failures",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_mse4_book_g_unreachable_objects{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Objects from unreachable stores in the books",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_book_liberation_failed{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Slot liberation failures",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_c_allocation_failure{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Allocation request failures",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_c_allocation_failure_timeout{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Allocation request failure due to a timeout",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_c_allocation_failure_noslot{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "llocation request failure due to no slot available",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_remap_failed{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Segment remap failure to produce towards the reserve",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_prune_failed{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Segment pruning failure to produce towards the reserve",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_c_io_limited{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "IO engine has been request limited",
+          "range": true,
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_g_io_blocked_read{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Read IO operations currently blocked",
+          "range": true,
+          "refId": "K"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(varnish_mse4_store_g_io_blocked_write{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Write IO operations currently blocked",
+          "range": true,
+          "refId": "L"
+        }
+      ],
+      "title": "MSE4 errors",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 49
+      },
+      "id": 79,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "rate(varnish_brotli_fail{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Brotli compressions failures",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "rate(varnish_brotli_test_decompression_fail{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
+          "format": "time_series",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Brotli test decompression failures",
+          "range": true,
+          "refId": "B",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "rate(varnish_brotli_decompression_fail{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Brotli decompression Failures",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Brotli errors",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 54
       },
       "id": 89,
       "panels": [],
@@ -2320,10 +3392,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
+        "h": 5,
+        "w": 8,
         "x": 0,
-        "y": 34
+        "y": 55
       },
       "id": 133,
       "options": {
@@ -2420,10 +3492,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 34
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 55
       },
       "id": 108,
       "options": {
@@ -2447,15 +3519,182 @@
             "uid": "prometheusUID"
           },
           "editorMode": "code",
-          "expr": "varnish_main_object_count",
+          "expr": "sum(varnish_mse4_object_used{service_name=~\"$service\",instance=~\"$instance\"})",
           "hide": false,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "All objects",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "varnish_mse4_object_ephemeral{service_name=~\"$service\",instance=~\"$instance\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Ephemeral objects",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_mse4_object_persisted{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Persisted objects with at least one chunk in memory",
+          "range": true,
+          "refId": "C"
         }
       ],
-      "title": "Cache size (objects)",
+      "title": "Objects in the cache",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 55
+      },
+      "id": 106,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_main_mem_private{service_name=~\"$service\",instance=~\"$instance\"}) / count(varnish_main_mem_private{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Worker process private memory usage",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_main_mem_rss{service_name=~\"$service\",instance=~\"$instance\"}) / count(varnish_main_mem_rss{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Worker process RSS memory usage",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_main_mem_file{service_name=~\"$service\",instance=~\"$instance\"}) / count (varnish_main_mem_file{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "RSS file usage",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_main_mem_swap{service_name=~\"$service\",instance=~\"$instance\"}) / count(varnish_main_mem_swap{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Varnish worker process swap usage",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Memory governor",
       "type": "timeseries"
     },
     {
@@ -2522,10 +3761,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 34
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 60
       },
       "id": 104,
       "options": {
@@ -2604,6 +3843,135 @@
         "type": "prometheus",
         "uid": "prometheusUID"
       },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Percentage per book",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 60
+      },
+      "id": 102,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_mse4_book_slot_used{service_name=~\"$service\",instance=~\"$instance\"})/sum(varnish_mse4_book_slot_used{service_name=~\"$service\",instance=~\"$instance\"} + varnish_mse4_book_slot_unused{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Book slots",
+          "range": true,
+          "refId": "Book slots"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_mse4_byte_used{service_name=~\"$service\",instance=~\"$instance\"})/sum(varnish_mse4_byte_used{service_name=~\"$service\",instance=~\"$instance\"} + varnish_mse4_byte_unused{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Memory",
+          "range": true,
+          "refId": "Memory"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_mse4_store_bytes_used{service_name=~\"$service\",instance=~\"$instance\"})/sum(varnish_mse4_store_bytes_used{service_name=~\"$service\",instance=~\"$instance\"} + varnish_mse4_store_bytes_unused{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Disk",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "MSE4 usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2657,41 +4025,162 @@
               }
             ]
           },
-          "unit": "decbytes"
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
-        "y": 34
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 60
       },
-      "id": 142,
+      "id": 111,
       "options": {
         "legend": {
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "hideZeros": false,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
       "pluginVersion": "12.2.1",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
           "editorMode": "code",
-          "expr": "sum by (instance) (label_replace(\n  label_replace(\n    label_replace({__name__=~\"varnish_sma_.*_g_bytes\"}, \"storage_space\", \"used\", \"unsused\", \".*\"),\n    \"storage_name\",\n    \"$name\",\n    \"__name__\",\n    \"varnish_sma_(?P<name>.*)_g_.*\"\n  ),\n  \"__name__\",\n  \"varnish_storage_bytes\",\n  \"unused\",\n  \".*\"\n))",
-          "legendFormat": "__auto",
+          "expr": "sum(varnish_mse4_g_ykey_keys{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Memory only",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_mse4_book_ykey_keys{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Persisted",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Number of ykeys in the cache",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 65
+      },
+      "id": 112,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "sum(varnish_mse4_book_varyspecs{service_name=~\"$service\",instance=~\"$instance\"})",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Number of Vary header instruction keys",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Cache size (bytes)",
+      "title": "Number of Vary header keys",
       "type": "timeseries"
     },
     {
@@ -2700,7 +4189,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 70
       },
       "id": 113,
       "panels": [],
@@ -2729,9 +4218,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
-        "y": 41
+        "y": 71
       },
       "id": 137,
       "options": {
@@ -2807,9 +4296,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 41
+        "w": 8,
+        "x": 8,
+        "y": 71
       },
       "id": 140,
       "options": {
@@ -2862,6 +4351,88 @@
       ],
       "title": "Backend Response TTLB",
       "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 71
+      },
+      "id": 117,
+      "options": {
+        "calculate": false,
+        "cellGap": 1,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "Oranges",
+          "steps": 64
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-9
+        },
+        "legend": {
+          "show": false
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "\n      label_replace(\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_10ms{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"0.01\", \"unused\", \".*\") or\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_100ms{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"0.1\", \"unused\", \".*\") or\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_1000ms{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"1\", \"unused\", \".*\") or\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_1000ms_up{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"+inf\", \"unused\", \".*\"),\n          \"__name__\",\n          \"varnish_mse4_book_c_ykey_iter_bucket\",\n          \"unused\",\n          \".*\"\n  )",
+          "format": "heatmap",
+          "instant": false,
+          "legendFormat": "Number of ykey iterations taking 0.01s or less",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Ykey iteration latency",
+      "type": "heatmap"
     }
   ],
   "preload": false,
@@ -2873,10 +4444,7 @@
       {
         "allValue": ".*",
         "allowCustomValue": true,
-        "current": {
-          "text": "All",
-          "value": "$__all"
-        },
+        "current": {},
         "definition": "label_values(varnish_client_duration_total_seconds_bucket,service_name)",
         "includeAll": true,
         "multi": true,
@@ -2895,10 +4463,7 @@
       {
         "allValue": ".*",
         "allowCustomValue": true,
-        "current": {
-          "text": "All",
-          "value": "$__all"
-        },
+        "current": {},
         "definition": "label_values(varnish_client_duration_total_seconds_bucket{service_name=~\"$service\"},instance)",
         "includeAll": true,
         "multi": true,
@@ -2934,7 +4499,7 @@
     ]
   },
   "timezone": "",
-  "title": "Varnish Cache metrics",
-  "uid": "cdfz96z",
+  "title": "Varnish Enterprise metrics",
+  "uid": "addz96z",
   "version": 1
 }

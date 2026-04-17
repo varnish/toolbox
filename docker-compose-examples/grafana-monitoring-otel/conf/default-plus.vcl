@@ -2,12 +2,16 @@ vcl 4.1;
 
 import vtc;
 import std;
+import ykey;
+
+include "otel.vcl";
 
 backend esi { .host = "origin-esi"; }
 backend files { .host = "origin-files"; }
 
 sub vcl_recv {
 	set req.http.x-route = regsub(req.url, "\?.*", "");
+	otel.route(req.http.x-route);
 	if (req.url ~ "esi") {
 		set req.backend_hint = esi;
 	} else {
@@ -32,10 +36,15 @@ sub vcl_recv {
 }
 
 sub vcl_backend_response {
+	# just creating some ykey action to fill the graphs
+	ykey.add_key(bereq.url);
+	ykey.purge_keys(bereq.url);
+
+	otel.route(bereq.http.x-route);
 	set beresp.do_esi = true;
 	if (bereq.url == "/esi_sub1" && bereq.retries == 1) {
 		std.log("BUG: deliberately slowing down the second fetch of /esi_sub1");
-		vtc.sleep(700ms);
+#		vtc.sleep(700ms);
 	}
 	if (bereq.url == "/esi_sub1" && bereq.retries < 3) {
 		return(retry);

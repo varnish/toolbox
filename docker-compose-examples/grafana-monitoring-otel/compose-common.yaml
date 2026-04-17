@@ -1,0 +1,55 @@
+services:
+  load_generator:
+    image: curlimages/curl
+    volumes:
+      - ./src/load_generator.sh:/usr/bin/load_generator
+    command: /usr/bin/load_generator
+    depends_on:
+      - varnish
+
+  origin-files: &origin
+    command: /app/main origin-files
+    volumes:
+      - ./data:/orig_data
+    environment: &otel_env
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://loki:3100/otlp/v1/logs
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://tempo:4318/v1/traces
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+    build:
+      dockerfile_inline: |
+        FROM golang
+        WORKDIR /app/
+        COPY src/origin/ .
+        RUN set -ex; \
+            go env -w GOPROXY=direct; \
+            CGO_ENABLED=0 go build -o /app/main main.go
+
+  origin-esi:
+    <<: *origin
+    command: /app/main origin-esi
+
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - 3000:3000
+    environment:
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    volumes:
+      - ./conf/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./conf/grafana/provisioning:/etc/grafana/provisioning/
+
+  tempo:
+    image: grafana/tempo:latest
+    command: "-config.file=/etc/tempo.yaml"
+    volumes:
+      - ./conf/tempo.yaml:/etc/tempo.yaml
+
+  prometheus:
+    image: prom/prometheus:v3
+    volumes:
+      - ./conf/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.enable-otlp-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
+
+  loki:
+    image: grafana/loki:3.1.0
+    command: -config.file=/etc/loki/local-config.yaml
