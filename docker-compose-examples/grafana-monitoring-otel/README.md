@@ -16,7 +16,7 @@ You should see the main dashboard, and you can also use the `Explore` tab to dis
 ## Varnish Enterprise
 
 - place the license file ( `varnish-enterprise.lic`, you can ask for one [here](https://www.varnish-software.com/contact-us/)) in `conf/`. The license should enable both `vmod-otel` and `mse4`.
-- run "docker compose up -d -f compose-plus.yaml"
+- run "docker compose -f compose-plus.yaml up -d"
 - go to http://localhost:3000
 - login with `admin:password`
 
