@@ -4423,10 +4423,10 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "\n      label_replace(\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_10ms{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"0.01\", \"unused\", \".*\") or\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_100ms{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"0.1\", \"unused\", \".*\") or\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_1000ms{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"1\", \"unused\", \".*\") or\n        label_replace(sum by (le) (increase(varnish_mse4_book_c_ykey_iter_1000ms_up{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])), \"le\", \"+inf\", \"unused\", \".*\"),\n          \"__name__\",\n          \"varnish_mse4_book_c_ykey_iter_bucket\",\n          \"unused\",\n          \".*\"\n  )",
+          "expr": "sum(increase(varnish_mse4_book_ykey_duration_seconds_bucket{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) by (le)",
           "format": "heatmap",
           "instant": false,
-          "legendFormat": "Number of ykey iterations taking 0.01s or less",
+          "legendFormat": "{{le}}",
           "range": true,
           "refId": "A"
         }
