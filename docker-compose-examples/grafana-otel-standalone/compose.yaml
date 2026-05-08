@@ -1,0 +1,79 @@
+services:
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./conf/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+    ports:
+      - "3100:3100"
+    networks:
+      - observability
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --web.enable-otlp-receiver
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
+    volumes:
+      - ./conf/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - observability
+
+  tempo:
+    image: grafana/tempo:2.7.0
+    container_name: tempo
+    command: -config.file=/etc/tempo/tempo-config.yaml
+    volumes:
+      - ./conf/tempo-config.yaml:/etc/tempo/tempo-config.yaml:ro
+    ports:
+      - "3200:3200"
+    networks:
+      - observability
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.116.1
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol/otel-collector-config.yaml"]
+    volumes:
+      - ./conf/otel-collector-config.yaml:/etc/otelcol/otel-collector-config.yaml:ro
+    ports:
+      - "4318:4318" # OTLP HTTP receiver (exposed to host)
+      - "4317:4317" # OTLP gRPC receiver (also exposed for convenience)
+      - "8888:8888" # Collector self-metrics
+    depends_on:
+      - loki
+      - prometheus
+      - tempo
+    networks:
+      - observability
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: grafana
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor,metricsSummary
+      - GF_INSTALL_PLUGINS=grafana-exploretraces-app
+    volumes:
+      - ./conf/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./conf/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+      - prometheus
+      - tempo
+    networks:
+      - observability
+
+networks:
+  observability:
+    driver: bridge
