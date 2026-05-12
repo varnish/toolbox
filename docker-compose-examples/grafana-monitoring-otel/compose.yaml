@@ -4,10 +4,10 @@ include:
 services:
   varnish:
     image: varnish
+    profiles: [varnish]
     volumes:
       - workdir:/var/lib/varnish
       - ./conf/default.vcl:/etc/varnish/default.vcl
-    command: varnishd -F -a :80 -f /etc/varnish/default.vcl
     ports:
       - "8080:80"
     depends_on:
@@ -18,6 +18,7 @@ services:
 
   varnish-otel:
     image: varnish
+    profiles: [varnish]
     command: varnish-otel
     volumes:
       - workdir:/var/lib/varnish
@@ -25,19 +26,17 @@ services:
       - varnish
     environment:
       OTEL_RESOURCE_ATTRIBUTES: service.instance.id=varnish1
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://loki:3100/otlp/v1/logs
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://tempo:4318/v1/traces
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
       OTEL_SERVICE_NAME: varnish
-      #OTEL_VARNISH_WORKDIR: varnish
+      OTEL_VARNISH_WORKDIR: varnish
     build:
       dockerfile_inline: |
         FROM varnish
         USER root
         RUN set -ex; \
             apt-get update; \
-            apt-get install varnish-otel; \
+            apt-get install -y varnish-otel; \
             rm -rf /var/lib/apt/lists/*
         USER varnish
 
