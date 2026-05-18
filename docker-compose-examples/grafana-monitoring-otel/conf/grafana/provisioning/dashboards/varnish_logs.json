@@ -90,7 +90,7 @@
       "dashes": false,
       "datasource": {
         "type": "loki",
-        "uid": "loki"
+        "uid": "lokiUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -136,7 +136,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "loki"
+            "uid": "lokiUID"
           },
           "expr": "sum(count_over_time({service_name=~\"$app\"} |= \"$search\" [$__interval]))",
           "legendFormat": "",
@@ -177,7 +177,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "loki"
+        "uid": "lokiUID"
       },
       "gridPos": {
         "h": 25,
@@ -201,7 +201,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "loki"
+            "uid": "lokiUID"
           },
           "expr": "{service_name=~\"$app\"} |= \"$search\" | logfmt",
           "hide": false,
@@ -226,7 +226,7 @@
         },
         "datasource": {
           "type": "loki",
-          "uid": "loki"
+          "uid": "lokiUID"
         },
         "definition": "label_values(service_name)",
         "hide": 0,

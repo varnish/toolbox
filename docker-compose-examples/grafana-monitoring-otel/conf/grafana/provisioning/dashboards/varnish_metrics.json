@@ -38,7 +38,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -91,7 +91,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "count(varnish_uptime{service_name=~\"$service\",instance=~\"$instance\"})",
@@ -106,7 +106,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -158,7 +158,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_client_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -175,7 +175,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -227,7 +227,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum((rate(varnish_client_duration_total_seconds_count{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])))",
@@ -244,7 +244,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -296,7 +296,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(varnish_backend_duration_total_seconds_count{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) / sum(rate(varnish_client_duration_total_seconds_count{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])))",
@@ -313,7 +313,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -365,7 +365,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(varnish_backend_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(varnish_client_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))))",
@@ -382,7 +382,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -437,7 +437,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -454,7 +454,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "Data transfer per second, which consists of headers and body bytes in the backend requests and backend responses.",
       "fieldConfig": {
@@ -563,7 +563,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_client_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -576,7 +576,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -589,7 +589,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -603,7 +603,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_backend_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -620,7 +620,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -723,7 +723,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_backend_connections{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -737,7 +737,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_sess{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -750,7 +750,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_backend_requests{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -763,7 +763,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_client_requests{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -780,7 +780,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -869,7 +869,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(varnish_backend_duration_total_seconds_count{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) / sum(rate(varnish_client_duration_total_seconds_count{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])))",
@@ -880,7 +880,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "1 - sum(rate(varnish_main_backend_connections{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) / sum(rate(varnish_main_sess{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -893,7 +893,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "1 - (sum(rate(varnish_backend_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) / sum(rate(varnish_client_response_bytes_byte_sum{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])))",
@@ -923,7 +923,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -1001,7 +1001,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -1091,7 +1091,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum by (failure_type) (rate(varnish_main_session_failed{service_name=~\"$service\",instance=~\"$instance\",failure_type!=\"\"}[$__rate_interval]))",
@@ -1108,7 +1108,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -1214,7 +1214,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_purges{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1227,7 +1227,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_bans{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1240,7 +1240,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_ban_req{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1257,7 +1257,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -1347,7 +1347,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_mse4_book_ykey_purged{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1360,7 +1360,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_mse4_book_ykey_slicer_purged{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1373,7 +1373,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_obj_purged{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1386,7 +1386,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_ban_obj_killed{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1399,7 +1399,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_ban_lurker_obj_killed{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1412,7 +1412,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_ban_lurker_obj_killed_cutoff{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1425,7 +1425,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "rate(varnish_mse3_store_ykey_purged{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
@@ -1455,7 +1455,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -1545,7 +1545,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_esi_requests{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1561,7 +1561,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -1651,7 +1651,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1664,7 +1664,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_backend_wait_failed{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1677,7 +1677,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_bgfetch_no_thread{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1694,7 +1694,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -1784,7 +1784,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1797,7 +1797,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_vdp_error{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1810,7 +1810,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_stream_failure{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1823,7 +1823,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_rapid_reset{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1836,7 +1836,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_esi_errors{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -1849,7 +1849,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1863,7 +1863,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1877,7 +1877,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1891,7 +1891,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1905,7 +1905,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1919,7 +1919,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1933,7 +1933,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1947,7 +1947,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1961,7 +1961,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1975,7 +1975,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1989,7 +1989,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2003,7 +2003,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2017,7 +2017,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2031,7 +2031,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2045,7 +2045,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2059,7 +2059,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2073,7 +2073,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_client_req_400{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -2086,7 +2086,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_client_resp_500{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -2103,7 +2103,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -2193,7 +2193,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "rate(varnish_main_esi_errors{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
@@ -2205,7 +2205,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "rate(varnish_main_esi_warnings{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
@@ -2218,7 +2218,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "rate(varnish_main_esi_maxdepth{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
@@ -2231,7 +2231,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "rate(varnish_main_esi_req_abort{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])",
@@ -2261,7 +2261,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -2344,7 +2344,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum by (host_name) (varnish_main_thread_live{service_name=~\"$service\",instance=~\"$instance\"})",
@@ -2359,7 +2359,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -2444,7 +2444,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "varnish_main_object_count",
@@ -2461,7 +2461,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "description": "",
       "fieldConfig": {
@@ -2546,7 +2546,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_lru_nuked{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -2559,7 +2559,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_mse4_book_liberated{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -2572,7 +2572,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_mse4_store_pruned_objects{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -2585,7 +2585,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "prometheusUID"
           },
           "editorMode": "code",
           "expr": "sum(rate(varnish_main_expired{service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))",
@@ -2602,7 +2602,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -2710,7 +2710,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
@@ -2788,7 +2788,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "prometheusUID"
       },
       "fieldConfig": {
         "defaults": {
