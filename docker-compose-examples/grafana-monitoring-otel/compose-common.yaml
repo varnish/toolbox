@@ -31,9 +31,9 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.116.1
     container_name: otel-collector
-    command: ["--config=/etc/otelcol/otel-collector-config.yaml"]
+    command: ["--config=/etc/otelcol/otel-collector.yaml"]
     volumes:
-      - ./conf/otel-collector-config.yaml:/etc/otelcol/otel-collector-config.yaml:ro
+      - ./conf/otel-collector.yaml:/etc/otelcol/otel-collector.yaml:ro
     ports:
       - "4318:4318" # OTLP HTTP receiver (exposed to host)
       - "4317:4317" # OTLP gRPC receiver (also exposed for convenience)
@@ -65,9 +65,9 @@ services:
   tempo:
     image: grafana/tempo:2.7.0
     container_name: tempo
-    command: -config.file=/etc/tempo/tempo-config.yaml
+    command: -config.file=/etc/tempo/tempo.yaml
     volumes:
-      - ./conf/tempo-config.yaml:/etc/tempo/tempo-config.yaml:ro
+      - ./conf/tempo.yaml:/etc/tempo/tempo.yaml:ro
     ports:
       - "3200:3200"
 
@@ -87,9 +87,9 @@ services:
   loki:
     image: grafana/loki:3.3.2
     container_name: loki
-    command: -config.file=/etc/loki/loki-config.yaml
+    command: -config.file=/etc/loki/loki.yaml
     volumes:
-      - ./conf/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - ./conf/loki.yaml:/etc/loki/loki.yaml:ro
     ports:
       - "3100:3100"
 
