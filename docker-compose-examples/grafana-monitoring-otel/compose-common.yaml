@@ -85,11 +85,8 @@ services:
       - "9090:9090"
 
   loki:
-    image: grafana/loki:3.3.2
+    image: grafana/loki
     container_name: loki
-    command: -config.file=/etc/loki/loki.yaml
-    volumes:
-      - ./conf/loki.yaml:/etc/loki/loki.yaml:ro
     ports:
       - "3100:3100"
 
