@@ -1,26 +1,28 @@
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 5s # Set the scrape interval to every 5 seconds. Default is every 1 minute.
 
 otlp:
   promote_resource_attributes:
+    - service.instance.id
     - service.name
     - service.namespace
-    - service.instance.id
+    - service.version
+    - cloud.availability_zone
+    - cloud.region
+    - container.name
     - deployment.environment
+    - deployment.environment.name
     - k8s.cluster.name
+    - k8s.container.name
+    - k8s.cronjob.name
+    - k8s.daemonset.name
+    - k8s.deployment.name
+    - k8s.job.name
     - k8s.namespace.name
     - k8s.pod.name
+    - k8s.replicaset.name
+    - k8s.statefulset.name
 
 storage:
   tsdb:
     out_of_order_time_window: 30m
-
-scrape_configs:
-  - job_name: prometheus
-    static_configs:
-      - targets: ["localhost:9090"]
-
-  - job_name: otel-collector
-    static_configs:
-      - targets: ["otel-collector:8888"]

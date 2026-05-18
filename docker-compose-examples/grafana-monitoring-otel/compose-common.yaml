@@ -72,7 +72,7 @@ services:
       - "3200:3200"
 
   prometheus:
-    image: prom/prometheus:v3.1.0
+    image: prom/prometheus
     container_name: prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yaml
