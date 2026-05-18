@@ -6,15 +6,6 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
 
-processors:
-  batch:
-    timeout: 5s
-    send_batch_size: 1024
-  memory_limiter:
-    check_interval: 1s
-    limit_percentage: 80
-    spike_limit_percentage: 25
-
 exporters:
   # Metrics -> Prometheus (native OTLP receiver)
   otlphttp/prometheus:
@@ -34,33 +25,14 @@ exporters:
     tls:
       insecure: true
 
-  debug:
-    verbosity: basic
-
-extensions:
-  health_check:
-    endpoint: 0.0.0.0:13133
-
 service:
-  extensions: [health_check]
-  telemetry:
-    metrics:
-      readers:
-        - pull:
-            exporter:
-              prometheus:
-                host: 0.0.0.0
-                port: 8888
   pipelines:
     metrics:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [otlphttp/prometheus, debug]
+      exporters: [otlphttp/prometheus]
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [otlphttp/loki, debug]
+      exporters: [otlphttp/loki]
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [otlp/tempo, debug]
+      exporters: [otlp/tempo]
