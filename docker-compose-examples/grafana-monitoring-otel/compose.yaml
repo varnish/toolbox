@@ -29,7 +29,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
       OTEL_SERVICE_NAME: varnish
-      OTEL_VARNISH_WORKDIR: varnish
+      OTEL_VARNISH_WORKDIR: varnishd
     build:
       dockerfile_inline: |
         FROM varnish
