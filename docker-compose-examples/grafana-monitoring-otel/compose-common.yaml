@@ -29,7 +29,7 @@ services:
     command: /app/main origin-esi
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.116.1
+    image: otel/opentelemetry-collector-contrib
     container_name: otel-collector
     command: ["--config=/etc/otelcol/otel-collector.yaml"]
     volumes:
