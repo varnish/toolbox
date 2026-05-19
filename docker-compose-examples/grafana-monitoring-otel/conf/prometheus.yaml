@@ -1,6 +1,10 @@
 global:
   scrape_interval: 5s # Set the scrape interval to every 5 seconds. Default is every 1 minute.
 
+storage:
+  tsdb:
+    out_of_order_time_window: 30m
+
 otlp:
   promote_resource_attributes:
     - service.instance.id
@@ -22,7 +26,3 @@ otlp:
     - k8s.pod.name
     - k8s.replicaset.name
     - k8s.statefulset.name
-
-storage:
-  tsdb:
-    out_of_order_time_window: 30m
