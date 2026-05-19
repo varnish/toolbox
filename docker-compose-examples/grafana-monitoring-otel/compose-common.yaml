@@ -1,6 +1,7 @@
 services:
   load_generator:
     image: curlimages/curl
+    profiles: [varnish]
     volumes:
       - ./src/load_generator.sh:/usr/bin/load_generator
     command: /usr/bin/load_generator
@@ -9,12 +10,11 @@ services:
 
   origin-files: &origin
     command: /app/main origin-files
+    profiles: [varnish]
     volumes:
       - ./data:/orig_data
     environment: &otel_env
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://loki:3100/otlp/v1/logs
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://tempo:4318/v1/traces
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://prometheus:9090/api/v1/otlp/v1/metrics
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
     build:
       dockerfile_inline: |
         FROM golang
@@ -28,28 +28,59 @@ services:
     <<: *origin
     command: /app/main origin-esi
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol/otel-collector.yaml"]
+    volumes:
+      - ./conf/otel-collector.yaml:/etc/otelcol/otel-collector.yaml:ro
+    ports:
+      - "4318:4318" # OTLP HTTP receiver (exposed to host)
+      - "4317:4317" # OTLP gRPC receiver (also exposed for convenience)
+      - "8888:8888" # Collector self-metrics
+    depends_on:
+      - loki
+      - prometheus
+      - tempo
+
   grafana:
     image: grafana/grafana-enterprise
-    ports:
-      - 3000:3000
-    environment:
-      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    container_name: grafana
     volumes:
       - ./conf/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./conf/grafana/provisioning:/etc/grafana/provisioning/
+      - ./conf/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+      - prometheus
+      - tempo
 
   tempo:
-    image: grafana/tempo:latest
-    command: "-config.file=/etc/tempo.yaml"
+    image: grafana/tempo
+    container_name: tempo
+    command: -config.file=/etc/tempo/tempo.yaml
     volumes:
-      - ./conf/tempo.yaml:/etc/tempo.yaml
+      - ./conf/tempo.yaml:/etc/tempo/tempo.yaml:ro
+    ports:
+      - "3200:3200"
 
   prometheus:
-    image: prom/prometheus:v3
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --web.enable-otlp-receiver
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
     volumes:
-      - ./conf/prometheus.yml:/etc/prometheus/prometheus.yml
-    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.enable-otlp-receiver --web.enable-remote-write-receiver --enable-feature=native-histograms
+      - ./conf/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+    ports:
+      - "9090:9090"
 
   loki:
-    image: grafana/loki:3.1.0
-    command: -config.file=/etc/loki/local-config.yaml
+    image: grafana/loki
+    container_name: loki
+    ports:
+      - "3100:3100"
+
