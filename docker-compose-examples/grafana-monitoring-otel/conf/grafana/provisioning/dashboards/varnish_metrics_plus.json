@@ -4433,6 +4433,305 @@
       ],
       "title": "Ykey iteration latency",
       "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "Percentage of origin latency avoided by serving from cache. Calculated as 1 minus (actual total response time / what total response time would have been if every request was a cache miss).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "semi-dark-orange",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 79
+      },
+      "id": 142,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "1 - (\n  sum(rate(varnish_client_duration_total_seconds_sum{handling=~\"hit|miss|pass|streaming-hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))\n  /\n  (\n    sum(rate(varnish_client_duration_total_seconds_count{handling=~\"hit|miss|pass|streaming-hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))\n    *\n    (\n      sum(rate(varnish_client_duration_total_seconds_sum{handling=~\"miss|pass|streaming-hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))\n      /\n      sum(rate(varnish_client_duration_total_seconds_count{handling=~\"miss|pass|streaming-hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval]))\n    )\n  )\n)",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Latency",
+          "range": true,
+          "refId": "Latency"
+        }
+      ],
+      "title": "Traffic offload (latency)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheusUID"
+      },
+      "description": "Response time split by cache outcome. 'Typical' lines show median latency. 'Large object' lines show the 90th percentile - these are slower because larger objects take longer to fetch from the origin. The gap between miss and hit lines is the time the cache saves per request.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Typical hit"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Large object hit"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    6,
+                    4
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Typical miss"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Large object miss"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    6,
+                    4
+                  ],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 85
+      },
+      "id": 143,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum(rate(varnish_client_duration_total_seconds_bucket{handling=\"hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) by (le))",
+          "legendFormat": "Typical hit",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.9, sum(rate(varnish_client_duration_total_seconds_bucket{handling=\"hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) by (le))",
+          "legendFormat": "Large object hit",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.5, sum(rate(varnish_client_duration_total_seconds_bucket{handling=~\"miss|pass|streaming-hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) by (le))",
+          "legendFormat": "Typical miss",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheusUID"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.9, sum(rate(varnish_client_duration_total_seconds_bucket{handling=~\"miss|pass|streaming-hit\",service_name=~\"$service\",instance=~\"$instance\"}[$__rate_interval])) by (le))",
+          "legendFormat": "Large object miss",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Hit vs Miss Latency",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -4501,5 +4800,5 @@
   "timezone": "",
   "title": "Varnish Enterprise metrics",
   "uid": "addz96z",
-  "version": 1
+  "version": 2
 }
