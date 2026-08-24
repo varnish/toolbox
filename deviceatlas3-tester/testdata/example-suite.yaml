@@ -1,0 +1,31 @@
+# Example DeviceAtlas3 test suite. Property names and expected values below
+# are illustrative only - replace with values that match your database.
+#
+# Each entry in `expected` triggers its own request/lookup (one property per
+# request), all sharing the same `request` headers and `full_lookup` mode.
+
+- name: iphone-safari
+  request:
+    headers:
+      User-Agent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1"
+  full_lookup: false
+  expected:
+    isMobilePhone: "1"
+    vendor: "Apple"
+
+- name: desktop-chrome
+  request:
+    headers:
+      User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  full_lookup: false
+  expected:
+    isMobilePhone: "0"
+
+- name: client-hints-full-lookup
+  request:
+    headers:
+      Sec-CH-UA-Mobile: "?1"
+      Sec-CH-UA-Platform: "\"Android\""
+  full_lookup: true
+  expected:
+    isMobilePhone: "1"
